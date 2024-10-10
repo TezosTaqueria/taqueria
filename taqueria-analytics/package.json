@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/analytics",
-	"version": "0.56.28",
+	"version": "0.56.29",
 	"description": "A TypeScript SDK submitting events for Taqueria activity",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -12,7 +12,8 @@
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
+		"clean": "rm -rf tsconfig.tsbuildinfo ./index.js ./index.d.ts ./index.mjs *.map ./types.js ./types.d.ts",
+		"build": "pnpm run clean && npx tsc -noEmit -p ./tsconfig.json && npx tsup"
 	},
 	"keywords": [
 		"taqueria",
@@ -39,6 +40,7 @@
 		"node-machine-id-xz": "^1.0.2"
 	},
 	"devDependencies": {
+		"@types/node": "^22.7.5",
 		"tsup": "^8.3.0",
 		"typescript": "^5.6.2"
 	},

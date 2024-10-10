@@ -14,6 +14,11 @@
 		"outDir": "lib",
 		"moduleResolution": "node"
 	},
+	"references": [
+		{
+			"path": "../taqueria-sdk"
+		}
+	],
 	"exclude": [
 		"example"
 	]

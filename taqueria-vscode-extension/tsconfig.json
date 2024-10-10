@@ -14,5 +14,13 @@
 	},
 	"exclude": [
 		".vscode-test"
+	],
+	"references": [
+		{
+			"path": "../taqueria-protocol"
+		},
+		{
+			"path": "../taqueria-analytics"
+		}
 	]
 }

@@ -17,6 +17,7 @@ export {
 	Task,
 } from '@taqueria/protocol';
 export * as Template from '@taqueria/protocol/Template';
+import { Contract } from '@taqueria/protocol/types';
 export { Protocol };
 import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
@@ -380,10 +381,10 @@ const parseSchema = <T extends Protocol.RequestArgs.t>(
 	};
 };
 
-const toProxableArgs = <T>(requestArgs: Protocol.RequestArgs.t, from: (input: unknown) => T) => {
+const toProxableArgs = <T>(requestArgs: Protocol.RequestArgs.t, from: (input: unknown) => T): T => {
 	const retval = Object.entries(requestArgs).reduce(
 		(retval, [key, value]) => {
-			if (key === 'projectDir') value = resolvePath(value.toString()) as Protocol.NonEmptyString.t;
+			if (key === 'projectDir') value = resolvePath(String(value).toString()) as Protocol.NonEmptyString.t;
 			else if (typeof value === 'string') {
 				if (value === 'true') value = true;
 				else if (value === 'false') value = false;
@@ -454,8 +455,8 @@ const getResponse =
 					const proxyArgs = toProxableArgs(
 						requestArgs,
 						Protocol.ProxyTemplateArgs.from.bind(Protocol.ProxyTemplateArgs),
-					);
-					const template = schema.templates?.find(tmpl => tmpl.template === proxyArgs.template);
+					) as Protocol.ProxyTemplateArgs.t;
+					const template = schema.templates?.find((tmpl: Protocol.Template.t) => tmpl.template === proxyArgs.template);
 					if (template) {
 						if (typeof template.handler === 'function') {
 							return template.handler(proxyArgs);
@@ -746,11 +747,17 @@ export const getDefaultSandboxAccount = (sandbox: Protocol.SandboxConfig.t) => {
 
 export const getContracts = (regex: RegExp, config: Protocol.LoadedConfig.t) => {
 	if (!config.contracts) return [];
-	return Object.values(config.contracts).reduce(
-		(retval: string[], contract) =>
-			regex.test(contract.sourceFile)
-				? [...retval, contract.sourceFile]
-				: retval,
+	return Object.entries(config.contracts).reduce<string[]>(
+		(retval, [_, contract]) => {
+			if (
+				contract && typeof contract === 'object' && 'sourceFile' in contract && typeof contract.sourceFile === 'string'
+			) {
+				return regex.test(contract.sourceFile)
+					? [...retval, contract.sourceFile]
+					: retval;
+			}
+			return retval;
+		},
 		[],
 	);
 };

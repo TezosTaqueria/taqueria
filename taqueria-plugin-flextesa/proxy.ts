@@ -32,7 +32,7 @@ import type { FlextesaAnnotations, Opts, ValidLoadedConfig, ValidOpts } from './
 // ATTENTION: There is a duplicate of this function in taqueria-vscode-extension/src/lib/gui/SandboxesDataProvider.ts
 // Please make sure the two are kept in-sync
 export const getUniqueSandboxName = async (sandboxName: string, projectDir: string) => {
-	const hash = await stringToSHA256(sandboxName + projectDir);
+	const hash = String(await stringToSHA256(sandboxName + projectDir));
 	return `${sandboxName.substring(0, 10)}-${hash.substring(0, 5)}`;
 };
 

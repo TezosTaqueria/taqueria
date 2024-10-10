@@ -1,17 +1,19 @@
 {
 	"name": "@taqueria/node-sdk",
-	"version": "0.56.28",
+	"version": "0.56.29",
 	"description": "A TypeScript SDK for NodeJS used for Taqueria plugin development.",
 	"main": "./index.js",
 	"source": "./index.ts",
 	"module": "./index.mjs",
+	"types": "./index.d.ts",
 	"exports": {
 		".": "./index.js",
 		"./types": "./types.js"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
+		"build": "npm run clean && npx tsc -noEmit -p ./tsconfig.json && tsup",
+		"clean": "rm -f index.js index.mjs index.d.ts index.js.map index.mjs.map"
 	},
 	"keywords": [
 		"taqueria",
@@ -38,6 +40,8 @@
 		"@taquito/signer": "^21.0.0-beta.0",
 		"@taquito/taquito": "^21.0.0-beta.0",
 		"@taquito/utils": "^21.0.0-beta.0",
+		"bip39": "^3.1.0",
+		"fluture": "^14.0.0",
 		"i18next": "^23.15.1",
 		"node-fetch": "^3.3.2",
 		"rambda": "^9.3.0",

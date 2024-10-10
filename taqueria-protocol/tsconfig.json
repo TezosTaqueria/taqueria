@@ -4,14 +4,14 @@
 
 		/* Projects */
 		// "incremental": true,                              /* Enable incremental compilation */
-		// "composite": true,                                /* Enable constraints that allow a TypeScript project to be used with project references. */
+		"composite": true, /* Enable constraints that allow a TypeScript project to be used with project references. */
 		// "tsBuildInfoFile": "./",                          /* Specify the folder for .tsbuildinfo incremental compilation files. */
 		// "disableSourceOfProjectReferenceRedirect": true,  /* Disable preferring source files instead of declaration files when referencing composite projects */
 		// "disableSolutionSearching": true,                 /* Opt a project out of multi-project reference checking when editing. */
 		// "disableReferencedProjectLoad": true,             /* Reduce the number of projects loaded automatically by TypeScript. */
 
 		/* Language and Environment */
-		"target": "es2019", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+		"target": "es2021", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
 		"lib": [
 			"ES2021.String"
 		], /* Specify a set of bundled library declaration files that describe the target runtime environment. */
@@ -28,9 +28,14 @@
 		/* Modules */
 		"module": "CommonJS", /* Specify what module code is generated. */
 		// "rootDir": "./",                                  /* Specify the root folder within your source files. */
-		// "moduleResolution": "node",                       /* Specify how TypeScript looks up a file from a given module specifier. */
+		"moduleResolution": "node", /* Specify how TypeScript looks up a file from a given module specifier. */
 		// "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
-		// "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
+		"paths": {
+			"@taqueria/protocol/*": ["./*"],
+			"@taqueria/protocol/out/*": ["./out/*.ts"],
+			"@taqueria/protocol/out/types/*": ["./out/types/*.ts"],
+			"@taqueria/protocol": ["./index.ts"]
+		}, /* Specify a set of entries that re-map imports to additional lookup locations. */
 		// "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
 		// "typeRoots": [],                                  /* Specify multiple folders that act like `./node_modules/@types`. */
 		// "types": [],                                      /* Specify type package names to be included without being referenced in a source file. */
@@ -99,5 +104,7 @@
 		/* Completeness */
 		// "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
 		"skipLibCheck": true /* Skip type checking all .d.ts files. */
-	}
+	},
+	"include": ["./out/**/*.ts", "./*.ts"],
+	"exclude": []
 }

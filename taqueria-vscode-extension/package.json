@@ -3,7 +3,7 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "Taqueria",
-	"version": "0.56.28",
+	"version": "0.56.29",
 	"private": true,
 	"engines": {
 		"vscode": "^1.84.2"
@@ -727,6 +727,7 @@
 		"@microsoft/signalr": "^8.0.0",
 		"@taqueria/analytics": "workspace:*",
 		"@taqueria/protocol": "workspace:*",
+		"@taquito/rpc": "^20.0.1",
 		"cli-table3": "^0.6.3",
 		"comment-json": "^4.2.3",
 		"eventsource": "^2.0.2",
