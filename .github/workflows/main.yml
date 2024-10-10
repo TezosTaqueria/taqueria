@@ -21,7 +21,9 @@ jobs:
         with:
           node-version: 20
       - uses: pnpm/action-setup@v4
-          
+        with:
+          version: 9
+
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
@@ -85,7 +87,9 @@ jobs:
             node-version: 20
 
         - uses: pnpm/action-setup@v4
-            
+          with:
+            version: 9
+
         - uses: denoland/setup-deno@v1
           with:
             deno-version: v1.x
