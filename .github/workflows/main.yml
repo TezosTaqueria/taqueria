@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -84,7 +84,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -147,7 +147,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -251,7 +251,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -302,7 +302,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -324,7 +324,7 @@ jobs:
             fi
           fi
           cd ${{ matrix.package.location }}
-          pnpm publish --tag $TAG
+          pnpm publish --no-git-checks --tag $TAG
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -534,9 +534,6 @@ jobs:
         id: set-matrix
         run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}}" >> "$GITHUB_OUTPUT"
 
-      - name: Debug
-        run: echo ${{ fromJson(steps.set-matrix.outputs.matrix) }}
-
   # Run E2E tests
   run-e2e-tests:
     needs:
@@ -549,7 +546,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -596,9 +593,6 @@ jobs:
         id: set-matrix
         run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}}" >> "$GITHUB_OUTPUT"
 
-      - name: Debug
-        run: echo ${{ fromJson(steps.set-matrix.outputs.matrix) }}
-
   # Run integration tests
   run-integration-tests:
     needs:
@@ -611,7 +605,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -643,7 +637,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
 
       - uses: pnpm/action-setup@v2
         with:
