@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/lib-ligo",
-	"version": "0.56.42",
+	"version": "0.56.43",
 	"description": "A taqueria library which provides common functionality for the LIGO and LIGO Legacy Plugins",
 	"targets": {
 		"default": {
@@ -12,7 +12,9 @@
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup",
+		"clean": "rm -f tsconfig.tsbuildinfo *.d.* *.mjs && find . -maxdepth 1 -type f -name '*.js' ! -name 'postinstall.js' -delete",
+		"typecheck": "pnpm exec tsc -p ./tsconfig.json",
+		"build": "pnpm run clean && pnpm run typecheck && pnpm exec tsup",
 		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
 		"compile": "npx ts-node index.ts --taqRun proxy --task compile --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
 		"debugPluginInfo": "npx ts-node --inspect index.ts --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\"}' --projectDir ../test-project --configDir ./.taq"
@@ -56,7 +58,7 @@
 		"sourcemap": true,
 		"target": "node16",
 		"outDir": "./",
-		"dts": true,
+		"dts": false,
 		"clean": false,
 		"skipNodeModulesBundle": true,
 		"platform": "node",

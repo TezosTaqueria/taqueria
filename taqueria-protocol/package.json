@@ -1,12 +1,13 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.56.42",
+	"version": "0.56.43",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"clean": "rm -f tsconfig.tsbuildinfo  *.js *.d.ts *.map out/*.js out/*.d.ts out/*.map out/types/*.js out/types/*.d.ts out/types/*.map",
-		"build": "pnpm run clean && pnpm exec tsc --emitDeclarationOnly -p ./tsconfig.json && pnpm exec tsup",
+		"typecheck": "pnpm exec tsc --emitDeclarationOnly -p ./tsconfig.json",
+		"build": "pnpm run clean && pnpm run typecheck && pnpm exec tsup",
 		"build-types": "pnpm exec ts-to-zod types.ts out/types-zod.ts && pnpm exec ts-node scripts/post-ts-to-zod.ts && pnpm exec ts-node scripts/build-types.ts"
 	},
 	"keywords": [

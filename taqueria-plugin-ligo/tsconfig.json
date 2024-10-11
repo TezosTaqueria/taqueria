@@ -103,6 +103,9 @@
 	"references": [
 		{
 			"path": "../taqueria-sdk"
+		},
+		{
+			"path": "../taqueria-lib-ligo"
 		}
 	]
 }
