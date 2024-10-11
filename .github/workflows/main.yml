@@ -20,12 +20,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
+          node-version: 22
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.30.1
+          version: 9
 
       - uses: denoland/setup-deno@v1
         with:
@@ -85,12 +84,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
+          node-version: 22
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.30.1
+          version: 9
 
       - uses: denoland/setup-deno@v1
         with:
@@ -149,12 +147,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
+          node-version: 22
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.30.1
+          version: 9
 
       - uses: denoland/setup-deno@v1
         with:
@@ -254,12 +251,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
+          node-version: 22
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.30.1
+          version: 9
 
       - name: Download work archive
         uses: actions/download-artifact@v4
@@ -306,12 +302,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
+          node-version: 22
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.30.1
+          version: 9
 
       - name: Publish to npm
         run: |
@@ -355,7 +350,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.30.1
+          version: 9
 
       - name: Build Website
         run: pnpm run build-website
@@ -485,7 +480,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.30.1
+          version: 9
 
       - name: Get version
         id: get_version
@@ -554,11 +549,11 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.30.1
+          version: 9
 
       - uses: actions/setup-python@v4
         with:
@@ -616,11 +611,11 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.30.1
+          version: 9
 
       - name: Download work archive
         uses: actions/download-artifact@v4
@@ -648,11 +643,11 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.30.1
+          version: 9
 
       - uses: denoland/setup-deno@v1
         with:
