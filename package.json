@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.56.44",
+	"version": "0.56.45",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -12,7 +12,7 @@
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
 		"build:packages": "lerna run build",
-		"deploy": "TAQUERIA_DEPLOY=1 npx lerna version minor --yes && git push && git push --tags",
+		"deploy": "TAQUERIA_DEPLOY=1 pnpm exec lerna version minor --yes && git push && git push --tags",
 		"build-website": "cd website && npm ci --legacy-peer-deps && npm run build",
 		"serve-website": "cd website && npm run serve",
 		"deploy-website": "cd website && npm run deploy",
