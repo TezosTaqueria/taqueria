@@ -533,9 +533,10 @@ jobs:
             files_json=$(printf '%s\n' "${files[@]}" | jq -R -s -c 'split("\n")[:-1]')
           fi
           echo "files=$files_json" >> $GITHUB_OUTPUT
+      
       - name: Set matrix for next job
         id: set-matrix
-        run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}}" >> "$GITHUB_OUTPUT"
+        run: echo "matrix={\"spec\":$(echo ${{ steps.list.outputs.files }} | jq -c .)}" >> "$GITHUB_OUTPUT"
 
   # Run E2E tests
   run-e2e-tests:
@@ -596,9 +597,11 @@ jobs:
             files_json=$(printf '%s\n' "${files[@]}" | jq -R -s -c 'split("\n")[:-1]')
           fi
           echo "files=$files_json" >> $GITHUB_OUTPUT
+
       - name: Set matrix for next job
         id: set-matrix
-        run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}}" >> "$GITHUB_OUTPUT"
+        run: echo "matrix={\"spec\":$(echo ${{ steps.list.outputs.files }} | jq -c .)}" >> "$GITHUB_OUTPUT"
+        
       - name: Debug matrix content
         run: |
           echo "Matrix content: ${{ steps.set-matrix.outputs.matrix }}"

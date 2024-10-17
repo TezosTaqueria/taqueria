@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-jest",
-	"version": "0.57.15",
+	"version": "0.57.16",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",
