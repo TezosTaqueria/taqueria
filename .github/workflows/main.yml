@@ -635,9 +635,9 @@ jobs:
           CWD=$(pwd)
           export PATH=$PATH:$CWD
           pnpm run test:integration -w tests ${{ matrix.spec }}
-          
+
       - name: Debug matrix content
-        run: echo "Matrix content: ${{ needs.list-integration-tests.outputs.matrix }}"
+        run: "echo \"Matrix content: ${{ needs.list-integration-tests.outputs.matrix }}"
 
 
   # Run all unit tests
