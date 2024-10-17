@@ -607,10 +607,8 @@ jobs:
       - build-packages
     runs-on: ubuntu-latest
     strategy:
-      strategy:
-        matrix:
-          spec: ${{ fromJson(needs.list-integration-tests.outputs.matrix).spec != '' && fromJson(needs.list-integration-tests.outputs.matrix).spec || '[]' }}
-
+      matrix:
+        spec: ${{ fromJson(needs.list-integration-tests.outputs.matrix).spec != '' && fromJson(needs.list-integration-tests.outputs.matrix).spec || '[]' }}
     steps:
       - uses: actions/setup-node@v4
         with:
