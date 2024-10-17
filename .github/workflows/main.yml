@@ -665,4 +665,4 @@ jobs:
           CWD=$(pwd)
           export PATH=$PATH:$CWD
           export DENO_DIR=$CWD/.deno
-          pnpm run test:unit -w tests
+          pnpm run --filter @taqueria/tests test:unit
