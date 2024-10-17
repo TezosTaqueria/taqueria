@@ -214,8 +214,8 @@ jobs:
           if [[ ! -z "${{ github.event.pull_request.number }}" || ! -z "$ISSUE_ID" ]]; then
             SHOULD_RUN="yes"
           fi
-          echo "should_run=$SHOULD_RUN" >> "$GITHUB_OUTPUT"
-          echo "issue_number=$ISSUE_ID" >> "$GITHUB_OUTPUT"
+          echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
+          echo "issue_number=$ISSUE_ID" >> $GITHUB_OUTPUT
 
   # Check whether this is a release
   check_is_release:
@@ -237,8 +237,8 @@ jobs:
             IS_RELEASE="yes"
             echo "This is a final release"
           fi
-          echo "is_release=$IS_RELEASE" >> "$GITHUB_OUTPUT"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "is_release=$IS_RELEASE" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
   # Gather package info for publishing
   gather-package-info:
@@ -278,7 +278,7 @@ jobs:
             TAGGED_PACKAGES+=("{\"name\":\"$pkg_name\",\"tag\":\"$pkg_tag\",\"location\":\"$pkg_location\"}")
           done
           TAGGED_PACKAGES_JSON="[$(IFS=,; echo "${TAGGED_PACKAGES[*]}")]"
-          echo "taggedPackages=$TAGGED_PACKAGES_JSON" >> "$GITHUB_OUTPUT"
+          echo "taggedPackages=$TAGGED_PACKAGES_JSON" >> $GITHUB_OUTPUT
 
   # Publish NPM packages to npm registry
   publish-packages:
@@ -523,29 +523,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: List .spec.ts files
-        id: list
+      - name: List .spec.ts files and Set matrix
+        id: set-matrix
         run: |
           files=$(ls tests/e2e/*.spec.ts 2>/dev/null || true)
           if [[ -z "$files" ]]; then
-            files_json="[]"
+            echo "matrix={\"spec\":[]}" >> $GITHUB_OUTPUT
           else
             files_json=$(printf '%s\n' "${files[@]}" | jq -R -s -c 'split("\n")[:-1]')
+            echo "matrix={\"spec\":${files_json}}" >> $GITHUB_OUTPUT
           fi
-          echo "files=$files_json" >> $GITHUB_OUTPUT
-
-      - name: Set matrix for next job
-        id: set-matrix
-        run: |
-          if [ -z "${{ steps.list.outputs.files }}" ]; then
-            echo "matrix={\"spec\":[]}" >> "$GITHUB_OUTPUT"
-          else
-            echo "matrix={\"spec\":${{ steps.list.outputs.files }}}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Debug matrix content
-        run: |
-          echo "Matrix content: ${{ steps.set-matrix.outputs.matrix }}"
 
   # Run E2E tests
   run-e2e-tests:
@@ -596,29 +583,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: List .spec.ts files
-        id: list
+      - name: List .spec.ts files and Set matrix
+        id: set-matrix
         run: |
           files=$(ls tests/integration/*.spec.ts 2>/dev/null || true)
           if [[ -z "$files" ]]; then
-            files_json="[]"
+            echo "matrix={\"spec\":[]}" >> $GITHUB_OUTPUT
           else
             files_json=$(printf '%s\n' "${files[@]}" | jq -R -s -c 'split("\n")[:-1]')
+            echo "matrix={\"spec\":${files_json}}" >> $GITHUB_OUTPUT
           fi
-          echo "files=$files_json" >> $GITHUB_OUTPUT
-
-      - name: Set matrix for next job
-        id: set-matrix
-        run: |
-          if [ -z "${{ steps.list.outputs.files }}" ]; then
-            echo "matrix={\"spec\":[]}" >> "$GITHUB_OUTPUT"
-          else
-            echo "matrix={\"spec\":${{ steps.list.outputs.files }}}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Debug matrix content
-        run: |
-          echo "Matrix content: ${{ steps.set-matrix.outputs.matrix }}"
 
   # Run integration tests
   run-integration-tests:
