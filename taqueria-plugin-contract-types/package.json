@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-contract-types",
-	"version": "0.57.18",
+	"version": "0.57.19",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",

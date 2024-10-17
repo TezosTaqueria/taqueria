@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/lib-ligo",
-	"version": "0.57.18",
+	"version": "0.57.19",
 	"description": "A taqueria library which provides common functionality for the LIGO and LIGO Legacy Plugins",
 	"targets": {
 		"default": {

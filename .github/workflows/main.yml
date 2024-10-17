@@ -573,7 +573,7 @@ jobs:
         run: |
           CWD=$(pwd)
           export PATH=$PATH:$CWD
-          pnpm run test:e2e -w tests ${{ matrix.spec }}
+          pnpm --filter @taqueria/tests run test:e2e ${{ matrix.spec }}
 
   # List integration tests to run
   list-integration-tests:
@@ -628,7 +628,7 @@ jobs:
         run: |
           CWD=$(pwd)
           export PATH=$PATH:$CWD
-          pnpm run test:integration -w tests ${{ matrix.spec }}
+          pnpm --filter @taqueria/tests run test:integration ${{ matrix.spec }}
 
   # Run all unit tests
   run-unit-tests:
