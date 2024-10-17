@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -84,7 +84,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -147,7 +147,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -251,7 +251,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -302,7 +302,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -526,10 +526,13 @@ jobs:
       - name: List .spec.ts files
         id: list
         run: |
-          files=$(ls tests/e2e/*.spec.ts)
-          files_json=$(printf '%s\n' "${files[@]}" | jq -R -s -c 'split("\n")[:-1]')
+          files=$(ls tests/e2e/*.spec.ts 2>/dev/null || true)
+          if [[ -z "$files" ]]; then
+            files_json="[]"
+          else
+            files_json=$(printf '%s\n' "${files[@]}" | jq -R -s -c 'split("\n")[:-1]')
+          fi
           echo "files=$files_json" >> $GITHUB_OUTPUT
-
       - name: Set matrix for next job
         id: set-matrix
         run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}}" >> "$GITHUB_OUTPUT"
@@ -546,7 +549,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -585,10 +588,13 @@ jobs:
       - name: List .spec.ts files
         id: list
         run: |
-          files=$(ls tests/integration/*.spec.ts)
-          files_json=$(printf '%s\n' "${files[@]}" | jq -R -s -c 'split("\n")[:-1]')
+          files=$(ls tests/integration/*.spec.ts 2>/dev/null || true)
+          if [[ -z "$files" ]]; then
+            files_json="[]"
+          else
+            files_json=$(printf '%s\n' "${files[@]}" | jq -R -s -c 'split("\n")[:-1]')
+          fi
           echo "files=$files_json" >> $GITHUB_OUTPUT
-
       - name: Set matrix for next job
         id: set-matrix
         run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}}" >> "$GITHUB_OUTPUT"
@@ -605,7 +611,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - uses: pnpm/action-setup@v2
         with:
@@ -637,7 +643,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - uses: pnpm/action-setup@v2
         with:
