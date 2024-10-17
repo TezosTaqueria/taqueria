@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '20'
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -86,7 +86,7 @@ jobs:
         with:
           node-version: '20'
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -149,7 +149,7 @@ jobs:
         with:
           node-version: '20'
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -253,7 +253,7 @@ jobs:
         with:
           node-version: '20'
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -304,7 +304,7 @@ jobs:
         with:
           node-version: '20'
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -348,7 +348,7 @@ jobs:
       - name: Extract work archive
         run: tar -xzpf work-packages.tar.gz
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -478,7 +478,7 @@ jobs:
       - name: Extract work archive
         run: tar -xzpf work-packages.tar.gz
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -545,13 +545,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        spec: ${{ fromJson(needs.list-e2e-tests.outputs.matrix).spec }}
+        spec: ${{ fromJson(needs.list-e2e-tests.outputs.matrix).spec != '' && fromJson(needs.list-e2e-tests.outputs.matrix).spec || '[]' }}
+
     steps:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -606,14 +607,16 @@ jobs:
       - build-packages
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        spec: ${{ fromJson(needs.list-integration-tests.outputs.matrix).spec }}
+      strategy:
+        matrix:
+          spec: ${{ fromJson(needs.list-integration-tests.outputs.matrix).spec != '' && fromJson(needs.list-integration-tests.outputs.matrix).spec || '[]' }}
+
     steps:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -645,7 +648,7 @@ jobs:
         with:
           node-version: '20'
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
