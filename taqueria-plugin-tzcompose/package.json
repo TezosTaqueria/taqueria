@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-tzcompose",
-	"version": "0.57.20",
+	"version": "0.57.21",
 	"description": "A TzCompose plugin for Taqueria using the GoTz SDK",
 	"main": "index.js",
 	"scripts": {
