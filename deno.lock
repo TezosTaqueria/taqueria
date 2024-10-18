@@ -324,7 +324,7 @@
     "https://deno.land/x/zod@v3.22.4/locales/en.ts": "a7a25cd23563ccb5e0eed214d9b31846305ddbcdb9c5c8f508b108943366ab4c",
     "https://deno.land/x/zod@v3.22.4/mod.ts": "64e55237cb4410e17d968cd08975566059f27638ebb0b86048031b987ba251c4",
     "https://deno.land/x/zod@v3.22.4/types.ts": "724185522fafe43ee56a52333958764c8c8cd6ad4effa27b42651df873fc151e",
-    "https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts": "6368780ee65d9f034a23b7d525229947e02f141a16f1678f2b25735f391a2c6e"
+    "https://raw.githubusercontent.com/mweichert/clipboard/refs/heads/master/mod.ts": "6368780ee65d9f034a23b7d525229947e02f141a16f1678f2b25735f391a2c6e"
   },
   "workspace": {
     "packageJson": {

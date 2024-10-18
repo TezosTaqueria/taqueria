@@ -11,6 +11,7 @@ import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
 
 // Third-party dependencies
+import clipboard from 'clipboard';
 import {
 	attemptP,
 	chain,
@@ -24,7 +25,6 @@ import {
 	resolve,
 } from 'fluture';
 import { pipe } from 'fun';
-import clipboard from 'https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts';
 
 // No-operation
 // noop: () -> void

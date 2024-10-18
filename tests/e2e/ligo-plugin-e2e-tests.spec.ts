@@ -11,14 +11,12 @@ import { join } from 'path';
 describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 	describe('tasks that rarely change', () => {
 		test('will use ligo binary from $PATH if available', async function() {
-			let testLigoDir = fs.realpathSync(os.tmpdir());
-			let testLigoPath = join(testLigoDir, 'ligo');
-			fs.writeFileSync(testLigoPath, '#!/bin/sh\necho Hello from test ligo');
-			fs.chmodSync(testLigoPath, '755');
-			let cwd = process.cwd();
-			const { execute, spawn, cleanup } = await prepareEnvironment();
-			process.env.PATH = `${testLigoDir}:${process.env.PATH}`;
+			const { execute, spawn, cleanup, path: projectDir, writeFile } = await prepareEnvironment();
+			process.env.PATH = `${projectDir}:${process.env.PATH}`;
 			const { waitForText } = await spawn('taq', 'init test-project');
+			let testLigoPath = join(projectDir, 'ligo');
+			await writeFile(testLigoPath, '#!/bin/sh\necho Hello from test ligo');
+			await exec(`chmod +x ${testLigoPath}`);
 			await waitForText("Project taq'ified!");
 			const { stdout: stdout1, stderr: stderr1 } = await execute(
 				'taq',
@@ -28,12 +26,16 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			expect(stdout1).toEqual(
 				expect.arrayContaining(['Plugin installed successfully']),
 			);
-			const { stdout: stdout2 } = await execute(
-				'env',
-				`PATH=${process.env.PATH} taq ligo --command help`,
-				'./test-project',
-			);
-			expect(stdout2).toEqual(expect.arrayContaining(['Hello from test ligo']));
+
+			const script = `#!/bin/bash
+			PATH="${process.env.PATH}"
+			cd ${join(projectDir, 'test-project')}
+			taq ligo --command help
+			`;
+			await writeFile(join(projectDir, 'test-script.sh'), script);
+			await exec(`chmod +x ${join(projectDir, 'test-script.sh')}`);
+			const { stdout: stdout2, stderr: stderr2 } = await exec(`${join(projectDir, 'test-script.sh')}`);
+			expect(stdout2).toContain('Hello from test ligo');
 			await cleanup();
 		});
 
