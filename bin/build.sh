@@ -20,7 +20,7 @@ if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
         else
             TARGET_ARG="--target $DENO_TARGET"
         fi
-        deno compile -o taq --allow-run --allow-write --allow-read --allow-env --allow-net --no-prompt index.ts $TARGET_ARG --setBuild "$TAQ_BUILD" --setVersion "$TAQ_VERSION"  
+        deno compile -o taq --allow-import --allow-run --allow-write --allow-read --allow-env --allow-net --no-prompt index.ts $TARGET_ARG --setBuild "$TAQ_BUILD" --setVersion "$TAQ_VERSION"  
     fi
 else
     echo "Usage: ./bin/build.sh"
