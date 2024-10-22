@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-flextesa",
-	"version": "0.59.1",
+	"version": "0.60.0",
 	"description": "A plugin for Taqueria providing local sandbox capabilities built on Flextesa",
 	"keywords": [
 		"taqueria",
