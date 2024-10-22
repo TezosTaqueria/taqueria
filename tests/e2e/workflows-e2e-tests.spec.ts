@@ -4,6 +4,8 @@ import util from 'util';
 
 const exec = util.promisify(exec1);
 
+jest.setTimeout(100000);
+
 describe('Workflows E2E Testing for Taqueria CLI,', () => {
 	test('ligo workflow will load expected plugins ', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();

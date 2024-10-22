@@ -1,7 +1,7 @@
 class Taqueria < Formula
     desc "Extensible, open-source plugin-based framework and task runner for Tezos development with a CLI and a library of plugins."
     homepage "https://taqueria.io"
-    version "0.58.0"
+    version "0.59.0"
     head "https://github.com/tezostaqueria/taqueria.git", :branch => "main"
     url "https://github.com/tezostaqueria/taqueria/archive/refs/tags/v0.57.0.tar.gz"
   
