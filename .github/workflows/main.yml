@@ -26,9 +26,9 @@ jobs:
         with:
           version: 9
 
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
 
       - name: Restore Deno Cache
         uses: actions/cache@v4
@@ -90,9 +90,9 @@ jobs:
         with:
           version: 9
 
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
 
       - name: Restore Deno Cache
         uses: actions/cache@v4
@@ -153,9 +153,9 @@ jobs:
         with:
           version: 9
 
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
 
       - name: Download work archive
         uses: actions/download-artifact@v4
