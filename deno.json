@@ -1,4 +1,5 @@
 {
+	"nodeModulesDir": "auto",
 	"imports": {
 		"eta": "https://deno.land/x/eta@v3.2.0/src/index.ts",
 		"zod": "https://deno.land/x/zod@v3.22.4/mod.ts",
