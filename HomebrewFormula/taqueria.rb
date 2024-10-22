@@ -3,10 +3,11 @@ class Taqueria < Formula
     homepage "https://taqueria.io"
     version "0.59.0"
     head "https://github.com/tezostaqueria/taqueria.git", :branch => "main"
-    url "https://github.com/tezostaqueria/taqueria/archive/refs/tags/v0.57.0.tar.gz"
+    url "https://github.com/tezostaqueria/taqueria/archive/refs/tags/v0.59.0.tar.gz"
   
     depends_on "node"
     depends_on "deno"
+    depends_on "pnpm"
   
     def install
         # Append the path to npm to the PATH environment variable

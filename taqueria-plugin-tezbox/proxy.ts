@@ -10,6 +10,7 @@ import {
 } from '@taqueria/node-sdk';
 import { generateSecretKey, InMemorySigner } from '@taquito/signer';
 import BigNumber from 'bignumber.js';
+import * as bip39 from 'bip39';
 import { createHash } from 'crypto';
 import { create } from 'domain';
 import * as fs from 'fs';
@@ -204,12 +205,56 @@ async function getOrCreateInstantiatedAccounts(
 		}
 
 		// Optionally, save the instantiated accounts to persist them for future runs
+		await saveInstantiatedAccounts(instantiatedAccounts, taskArgs.projectDir, taskArgs.env);
 	}
 
 	return instantiatedAccounts;
 }
 
-import * as bip39 from 'bip39';
+/**
+ * Saves instantiated accounts to the local configuration file.
+ * @param accounts Record of instantiated accounts
+ * @param projectDir Project directory path
+ * @param env Environment name
+ */
+async function saveInstantiatedAccounts(
+	accounts: Record<string, InstantiatedAccount>,
+	projectDir: string,
+	env: string,
+): Promise<void> {
+	const configPath = path.join(projectDir, `.taq/config.local.${env}.json`);
+
+	try {
+		// Read existing config or use an empty object if file doesn't exist
+		let config: Record<string, any> = {};
+		try {
+			const configContent = await fs.promises.readFile(configPath, 'utf8');
+			config = JSON.parse(configContent);
+		} catch (error) {
+			// If file doesn't exist or there's an error reading it, we'll use an empty object
+		}
+
+		// Convert InstantiatedAccount to SandboxAccountConfig, omitting encryptedKey
+		const sandboxAccounts: Record<string, Omit<SandboxAccountConfig, 'encryptedKey'>> = {};
+		for (const [name, account] of Object.entries(accounts)) {
+			sandboxAccounts[name] = {
+				publicKeyHash: account.publicKeyHash,
+				secretKey: account.secretKey,
+			};
+		}
+
+		// Update only the accounts property in the config
+		config.accounts = sandboxAccounts;
+
+		// Ensure the directory exists
+		await fs.promises.mkdir(path.dirname(configPath), { recursive: true });
+
+		// Write the updated config back to the file
+		await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
+	} catch (error) {
+		throw new Error('Failed to save instantiated accounts');
+	}
+}
 
 /**
  * Generates a mnemonic phrase using BIP39.
@@ -949,6 +994,47 @@ async function listAccounts(taskArgs: Opts): Promise<void> {
 }
 
 /**
+ * Bakes a block in the sandbox.
+ */
+async function bakeBlock(taskArgs: Opts): Promise<void> {
+	try {
+		if (await isSandboxRunning(taskArgs)) {
+			const containerName = getDockerContainerName(taskArgs);
+			const cmd = `docker exec ${containerName} octez-client bake for baker1`;
+
+			if (taskArgs.watch) {
+				console.log('Baking on demand as operations are injected.');
+				console.log('Press CTRL-C to stop and exit.');
+				console.log();
+
+				while (true) {
+					console.log('Waiting for operations to be injected...');
+					while (true) {
+						const { stdout } = await runCommand(
+							`docker exec ${containerName} octez-client rpc get /chains/main/mempool/pending_operations`,
+						);
+						const ops = JSON.parse(stdout);
+						if (Array.isArray(ops.applied) && ops.applied.length > 0) break;
+						await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second before checking again
+					}
+
+					await runCommand(cmd);
+					console.log('Block baked.');
+				}
+			} else {
+				await runCommand(cmd);
+				await sendAsyncRes('Block baked successfully.');
+			}
+		} else {
+			await sendAsyncErr('Sandbox is not running. Please start the sandbox before attempting to bake a block.');
+		}
+	} catch (error) {
+		const errorMessage = getErrorMessage(error);
+		await sendAsyncErr(`Failed to bake block: ${errorMessage}`);
+	}
+}
+
+/**
  * Main proxy function to handle tasks.
  */
 export const proxy = async (taskArgs: Opts): Promise<void> => {
@@ -973,6 +1059,8 @@ export const proxy = async (taskArgs: Opts): Promise<void> => {
 		'list-accounts': listAccounts,
 		'show accounts': listAccounts,
 		'show-accounts': listAccounts,
+		'bake': bakeBlock,
+		'bake block': bakeBlock,
 	};
 
 	const handler = taskName ? taskHandlers[taskName] : undefined;
