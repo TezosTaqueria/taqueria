@@ -104,7 +104,7 @@ export const inject = (deps: PluginDeps) => {
 
 	// Gets the command line arguments to invoke the plugin.
 	// The return value is a list of string that could be
-	// invoked using Deno.run
+	// invoked using Deno.Command
 	// getPluginExec: InstalledPlugin -> string[]
 	const getPluginExe = (plugin: InstalledPlugin.t) => {
 		switch (plugin.type) {

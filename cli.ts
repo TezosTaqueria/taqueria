@@ -685,7 +685,14 @@ const initProject = (
 		mkInitialDirectories(projectDir, maxConcurrency, i18n),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
 		chain(_ => preInstallPluginsOnInit(parsedArgs, projectDir)),
-		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/tezostaqueria/taqueria/issues/528
+		map(_ => {
+			const command = new Deno.Command('taq', {
+				cwd: projectDir,
+				stdout: 'piped',
+				stderr: 'piped',
+			});
+			return command.output();
+		}),
 		chain(_ => createGitIgnoreFile(projectDir)),
 		map(_ => i18n.__('bootstrapMsg')),
 	);

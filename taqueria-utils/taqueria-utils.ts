@@ -282,17 +282,18 @@ export const inject = (deps: UtilsDependencies) => {
 				map(() => destinationPath),
 			);
 
-	const execWithoutShell = (command: string, commandArgs?: string[], opts?: Record<string, string>) =>
+	const execWithoutShell = (command: string, commandArgs?: string[], opts?: Deno.CommandOptions) =>
 		attemptP<TaqError.t, [number, string, string]>(async () => {
-			const child = Deno.run({
-				cmd: [command, ...commandArgs!],
+			const cmd = new Deno.Command(command, {
+				args: commandArgs,
 				...opts,
 				stdout: 'inherit',
 			});
 
-			const status = await child.status();
+			const child = cmd.spawn();
+			const status = await child.status;
 
-			return Promise.resolve([status.code, '', '']);
+			return [status.code, '', ''];
 		});
 
 	const decodeText = (result: Deno.CommandOutput): Promise<[string, string]> => {

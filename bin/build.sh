@@ -11,8 +11,8 @@ if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
         MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
         MINOR_VERSION=$(echo $VERSION | cut -d. -f2)
 
-        if [ "$MAJOR_VERSION" -lt "1" ] || [ "$MAJOR_VERSION" -eq "1" -a "$MINOR_VERSION" -lt "36" ]; then
-            echo "❌ Deno is installed, but the version is less than v1.34. Please use Deno v1.36 or greater."
+        if [ "$MAJOR_VERSION" -lt "2" ]; then
+            echo "❌ Deno is installed, but the version is less than v1.34. Please use Deno v2.00 or greater."
             exit 1
         fi
         if [  -z "$DENO_TARGET" ]; then

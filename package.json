@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.60.1",
+	"version": "0.60.2",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -20,8 +20,7 @@
 		"build-and-watch-vscode": "npx chokidar \"*.ts\" \"taqueria-vscode-extension/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"pnpm run compile --filter taqueria-vscode-extension\" --initial",
 		"prepare": "npx husky",
 		"format": "npx dprint fmt",
-		"format:check": "npx dprint check",
-		"update-lock": "deno cache --lock-write index.ts"
+		"format:check": "npx dprint check"
 	},
 	"repository": {
 		"type": "git",
@@ -67,12 +66,10 @@
 	},
 	"lint-staged": {
 		"*.ts": [
-			"npx dprint fmt --config ./dprint.json",
-			"bash -c 'npm run update-lock'"
+			"npx dprint fmt --config ./dprint.json"
 		],
 		"*.tsx": [
-			"npx dprint fmt --config ./dprint.json",
-			"bash -c 'npm run update-lock'"
+			"npx dprint fmt --config ./dprint.json"
 		],
 		"*.json": "npx dprint fmt --config ./dprint.json"
 	}
