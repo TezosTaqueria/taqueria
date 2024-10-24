@@ -23,13 +23,13 @@ for dir in "${directories[@]}"; do
   # Update dependencies
   dependencies=$(jq -r '.dependencies | keys[] | select(startswith("@taquito"))' package.json)
   for package in $dependencies; do
-    npm i -S "${package}@${TAG}"
+    pnpm add "${package}@${TAG}"
   done
 
   # Update devDependencies
   devDependencies=$(jq -r '.devDependencies | keys[] | select(startswith("@taquito"))' package.json)
   for package in $devDependencies; do
-    npm i -D "${package}@${TAG}"
+    pnpm add -D "${package}@${TAG}"
   done
 
   # Return to the parent directory

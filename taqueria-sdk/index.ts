@@ -150,8 +150,19 @@ const filterNPMWarnings = (stderr: string): string =>
 const filterShellCmdStderr = (stderr: string) => {
 	let retval = filterDockerImageMessages(stderr);
 	retval = filterNPMWarnings(retval);
-
+	retval = filterOctezWarningMessages(retval);
 	return retval;
+};
+
+const filterOctezWarningMessages = (stderr: string) => {
+	// Filter out warning messages from Octez
+	return stderr
+		.split('\n')
+		.filter(line => !line.trim().startsWith('Warning:'))
+		.filter(line => !line.includes('This is NOT the Tezos Mainnet.'))
+		.filter(line => !line.includes('Do NOT use your fundraiser keys on this network.'))
+		.join('\n')
+		.trim();
 };
 
 type ExecErrProps = {

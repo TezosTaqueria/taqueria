@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-smartpy",
-	"version": "0.61.1",
+	"version": "0.61.2",
 	"description": "A taqueria plugin used to test and compile smart contracts written in SmartPy.",
 	"main": "index.js",
 	"targets": {

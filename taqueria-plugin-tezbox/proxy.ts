@@ -36,10 +36,7 @@ interface TezboxAccount {
 	balance: string;
 }
 
-type SandboxConfigV1 = SandboxConfig & {
-	blockTime?: number;
-	baking?: BakingOption;
-};
+type SandboxConfigV1 = SandboxConfig;
 
 interface ProtocolMapping {
 	id: string; // e.g., "Proxford"
@@ -52,6 +49,7 @@ interface DockerRunParams {
 	containerName: string;
 	configDir: string;
 	dataDir: string;
+	port: number;
 }
 
 enum BakingOption {
@@ -69,11 +67,19 @@ const logger = {
 };
 
 /**
- * Extracts error message from unknown error type.
+ * Extracts error message from unknown error type and prepends a prefix.
+/**
+ * Extracts error message from unknown error type and optionally prepends a prefix.
  */
-function getErrorMessage(error: unknown): string {
-	if (error instanceof Error) return error.message;
-	return String(error);
+function getErrorMessage(prefix: string, error: unknown): string {
+	if (prefix === '') {
+		return error instanceof Error ? error.message : String(error);
+	}
+	if (typeof error === 'boolean') {
+		return `${prefix}:`;
+	}
+	const errorString = error instanceof Error ? error.message : String(error);
+	return `${prefix}: ${errorString}`;
 }
 
 /**
@@ -86,7 +92,7 @@ async function runCommand(
 	cmd: string,
 	stderrHandler?: (stderr: string) => void | Promise<void>,
 ): Promise<{ stdout: string }> {
-	logger.info(`Executing command: ${cmd}`);
+	// logger.info(`Executing command: ${cmd}`);
 	try {
 		const { stdout, stderr } = await execCmd(cmd);
 		if (stderr.trim()) {
@@ -98,7 +104,7 @@ async function runCommand(
 		}
 		return { stdout };
 	} catch (error) {
-		throw new Error(`Command failed: ${getErrorMessage(error)}`);
+		throw new Error(getErrorMessage(`Command failed`, error));
 	}
 }
 
@@ -252,7 +258,7 @@ async function saveInstantiatedAccounts(
 		// Write the updated config back to the file
 		await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
 	} catch (error) {
-		throw new Error('Failed to save instantiated accounts');
+		throw new Error(getErrorMessage('Failed to save instantiated accounts', error));
 	}
 }
 
@@ -404,8 +410,7 @@ async function prepareAccountsHjson(taskArgs: Opts, tezBoxConfigDir: string): Pr
 		// Write the accounts.hjson file
 		await writeAccountsHjson(tezboxAccounts, tezBoxConfigDir);
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		throw new Error(`Failed to prepare accounts: ${errorMessage}`);
+		throw new Error(getErrorMessage(`Failed to prepare accounts`, error));
 	}
 }
 
@@ -459,8 +464,7 @@ async function prepareBakersHjson(taskArgs: Opts, tezBoxConfigDir: string): Prom
 		const bakersHjsonPath = path.join(tezBoxConfigDir, 'bakers.hjson');
 		await fs.promises.writeFile(bakersHjsonPath, fixedHjsonContent, 'utf8');
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		throw new Error(`Failed to prepare bakers: ${errorMessage}`);
+		throw new Error(getErrorMessage(`Failed to prepare bakers`, error));
 	}
 }
 
@@ -523,6 +527,16 @@ async function checkSandboxRunning(taskArgs: Opts): Promise<boolean> {
 	return running;
 }
 
+function getPortNumber(taskArgs: Opts) {
+	const rpcUrl = getSandboxConfig(taskArgs).rpcUrl;
+	const match = rpcUrl.match(/:(\d+)/);
+	return match ? parseInt(match[1], 10) : 80;
+}
+
+function getContainerPort(taskArgs: Opts) {
+	return getPortNumber(taskArgs) + 1;
+}
+
 /**
  * Gets the docker run parameters.
  */
@@ -532,8 +546,9 @@ async function getDockerRunParams(taskArgs: Opts): Promise<DockerRunParams> {
 	const platform = await getArch();
 	const configDir = getTezBoxConfigDir(taskArgs);
 	const dataDir = getTezBoxDataDir(taskArgs);
+	const port = getContainerPort(taskArgs);
 
-	return { platform, image, containerName, configDir, dataDir };
+	return { platform, image, containerName, configDir, dataDir, port };
 }
 
 /**
@@ -549,16 +564,16 @@ async function ensureDirectoriesExist(directories: string[]): Promise<void> {
  * Constructs the docker run command.
  */
 function constructDockerRunCommand(params: DockerRunParams): string {
-	const { platform, image, containerName, configDir } = params;
+	const { platform, image, containerName, configDir, port } = params;
 
 	const dockerOptions = [
 		'docker run',
 		'-d',
-		// '--rm',
 		`--platform ${platform}`,
-		'-p 0.0.0.0:8732:8732',
-		`-v "${configDir}:/tezbox/overrides"`,
+		'-p 8732:8732',
+		`-p ${port}:20000`,
 		`--name ${containerName}`,
+		`-v "${configDir}:/tezbox/overrides"`,
 		image,
 		// 'qenabox', // TODO: restore once working upstream
 	];
@@ -584,7 +599,7 @@ function validateBlockTime(taskArgs: Opts): number | null {
  */
 async function writeSandboxParameters(
 	protocolId: string,
-	parameters: Record<string, string>,
+	parameters: Record<string, string | number>,
 	tezBoxConfigDir: string,
 ): Promise<void> {
 	const protocolsDir = path.join(tezBoxConfigDir, 'protocols', protocolId);
@@ -603,7 +618,7 @@ async function writeSandboxParameters(
 	try {
 		await fs.promises.chmod(sandboxParamsPath, 0o644);
 	} catch (error) {
-		logger.warn(`Failed to set file permissions for ${sandboxParamsPath}: ${getErrorMessage(error)}`);
+		logger.warn(getErrorMessage(`Failed to set file permissions for ${sandboxParamsPath}`, error));
 	}
 }
 
@@ -615,8 +630,11 @@ async function applyBlockTimeOverrideToProtocol(
 	blockTime: number,
 	tezBoxConfigDir: string,
 ): Promise<void> {
+	const nonce_revelation_threshold = 16;
+	const minimal_block_delay = blockTime;
+
 	const parameters = {
-		minimal_block_delay: `${blockTime}`, // Value must be a string
+		minimal_block_delay: minimal_block_delay.toString(),
 	};
 	await writeSandboxParameters(protocolId, parameters, tezBoxConfigDir);
 }
@@ -683,8 +701,7 @@ async function readProtocolJson(image: string, protocolId: string): Promise<Prot
 			return null;
 		}
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		logger.warn(`Failed to read protocol.hjson for protocolId ${protocolId}: ${errorMessage}`);
+		logger.warn(getErrorMessage(`Failed to read protocol.hjson for protocolId ${protocolId}`, error));
 		return null;
 	}
 }
@@ -759,13 +776,13 @@ async function prepareSandboxParametersHjson(taskArgs: Opts, tezBoxConfigDir: st
 		}
 
 		// Debug: Log the protocol IDs to override
-		logger.info(`Protocol IDs to override: ${protocolIdsToOverride.join(', ')}`);
+		// logger.info(`Protocol IDs to override: ${protocolIdsToOverride.join(', ')}`);
 
 		// Apply block time override to each protocol ID
 		await applyBlockTimeOverrideToProtocols(protocolIdsToOverride, blockTime, tezBoxConfigDir);
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		throw new Error(`Failed to prepare sandbox parameters: ${errorMessage}`);
+		const errorMessage = getErrorMessage(`Failed to prepare sandbox parameters:`, error);
+		throw new Error(errorMessage);
 	}
 }
 
@@ -790,7 +807,7 @@ async function prepareBakerHjson(tezBoxConfigDir: string): Promise<void> {
 		const bakerConfigPath = path.join(servicesDir, 'baker.hjson');
 		await fs.promises.writeFile(bakerConfigPath, hjsonContent, 'utf8');
 	} catch (error) {
-		throw new Error(`Failed to prepare baker.hjson: ${getErrorMessage(error)}`);
+		throw new Error(getErrorMessage(`Failed to prepare baker.hjson`, error));
 	}
 }
 
@@ -831,9 +848,38 @@ async function prepareTezBoxOverrides(taskArgs: Opts): Promise<void> {
 		// Run all preparations in parallel
 		await Promise.all(tasks);
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		throw new Error(`Failed to prepare TezBox overrides: ${errorMessage}`);
+		throw new Error(getErrorMessage(`Failed to prepare TezBox overrides`, error));
 	}
+}
+
+function getProxyContainerName(taskArgs: Opts) {
+	return `${getDockerContainerName(taskArgs)}-proxy`;
+}
+
+async function startProxyServer(taskArgs: Opts): Promise<void> {
+	const containerPort = getContainerPort(taskArgs);
+	const proxyPort = getPortNumber(taskArgs);
+	const proxyContainerName = getProxyContainerName(taskArgs);
+
+	const proxyCmd = `docker run -d --name ${proxyContainerName} \
+        --network host \
+        caddy:2-alpine \
+        caddy reverse-proxy \
+        --from http://:${proxyPort} \
+        --to http://127.0.0.1:${containerPort} \
+        --access-log`;
+
+	try {
+		await runCommand(proxyCmd);
+	} catch (error) {
+		throw new Error(getErrorMessage(`Failed to start Caddy reverse proxy`, error));
+	}
+}
+
+async function stopProxyServer(taskArgs: Opts): Promise<void> {
+	const proxyContainerName = getProxyContainerName(taskArgs);
+	const cmd = `docker rm -f ${proxyContainerName}`;
+	await runCommand(cmd);
 }
 
 /**
@@ -860,16 +906,18 @@ async function startSandbox(taskArgs: Opts): Promise<void> {
 
 		// Construct the Docker run command
 		const cmd = constructDockerRunCommand(params);
-		logger.info(`Starting sandbox with command: ${cmd}`);
+		// logger.info(`Starting sandbox with command: ${cmd}`);
 
 		// Execute the Docker run command
 		await runCommand(cmd);
 
+		// Start the proxy server
+		await startProxyServer(taskArgs);
+
 		// Send a success response
 		await sendAsyncRes('Sandbox started successfully.');
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		await sendAsyncErr(`Failed to start sandbox: ${errorMessage}`);
+		await sendAsyncErr(getErrorMessage(`Failed to start sandbox`, error));
 	}
 }
 
@@ -894,7 +942,7 @@ async function removeSandboxContainer(taskArgs: Opts): Promise<void> {
 	try {
 		await runCommand(cmd);
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
+		const errorMessage = getErrorMessage('', error);
 		if (errorMessage.includes('No such container')) {
 			// Container does not exist
 			await sendAsyncRes('Sandbox is not running or already stopped.');
@@ -902,6 +950,9 @@ async function removeSandboxContainer(taskArgs: Opts): Promise<void> {
 			throw new Error(errorMessage);
 		}
 	}
+
+	// Stop the proxy server
+	await stopProxyServer(taskArgs);
 }
 
 /**
@@ -919,8 +970,7 @@ async function stopSandbox(taskArgs: Opts): Promise<void> {
 		// Send a success response
 		await sendAsyncRes('Sandbox stopped and cleaned up.');
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		await sendAsyncErr(`Failed to stop sandbox: ${errorMessage}`);
+		await sendAsyncErr(getErrorMessage(`Failed to stop sandbox`, error));
 	}
 }
 
@@ -938,8 +988,7 @@ async function restartSandbox(taskArgs: Opts): Promise<void> {
 		// Send a success response
 		await sendAsyncRes('Sandbox restarted successfully.');
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		await sendAsyncErr(`Failed to restart sandbox: ${errorMessage}`);
+		await sendAsyncErr(getErrorMessage(`Failed to restart sandbox`, error));
 	}
 }
 
@@ -952,8 +1001,7 @@ async function listProtocols(taskArgs: Opts): Promise<void> {
 		const protocolObjects = protocolHashes.map(protocol => ({ protocol }));
 		await sendAsyncJsonRes(protocolObjects);
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		await sendAsyncErr(`Failed to list protocols: ${errorMessage}`);
+		await sendAsyncErr(getErrorMessage(`Failed to list protocols`, error));
 	}
 }
 
@@ -988,8 +1036,7 @@ async function listAccounts(taskArgs: Opts): Promise<void> {
 			await sendAsyncErr(`Sandbox is not running. Please start the sandbox before attempting to list accounts.`);
 		}
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		await sendAsyncErr(`Failed to list accounts: ${errorMessage}`);
+		await sendAsyncErr(getErrorMessage(`Failed to list accounts`, error));
 	}
 }
 
@@ -1026,11 +1073,14 @@ async function bakeBlock(taskArgs: Opts): Promise<void> {
 				await sendAsyncRes('Block baked successfully.');
 			}
 		} else {
-			await sendAsyncErr('Sandbox is not running. Please start the sandbox before attempting to bake a block.');
+			try {
+				await sendAsyncErr('Sandbox is not running. Please start the sandbox before attempting to bake a block.');
+			} catch {
+				// Nothing to see here.
+			}
 		}
 	} catch (error) {
-		const errorMessage = getErrorMessage(error);
-		await sendAsyncErr(`Failed to bake block: ${errorMessage}`);
+		await sendAsyncErr(getErrorMessage(`Failed to bake block`, error));
 	}
 }
 
@@ -1069,8 +1119,7 @@ export const proxy = async (taskArgs: Opts): Promise<void> => {
 		try {
 			await handler(taskArgs);
 		} catch (error) {
-			const errorMessage = getErrorMessage(error);
-			await sendAsyncErr(`Error executing task '${taskArgs.task}': ${errorMessage}`);
+			await sendAsyncErr(getErrorMessage(`Error executing task '${taskArgs.task}'`, error));
 		}
 	} else {
 		await sendAsyncErr(taskArgs.task ? `Unknown task: ${taskArgs.task}` : 'No task provided');

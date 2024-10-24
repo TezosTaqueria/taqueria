@@ -350,7 +350,7 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 	};
 
 	const simpleEnvironments = environments.filter(x => x.value.type === `simple`);
-	const sandboxEnvironments = environments.filter(x => x.value.type === `flextesa`);
+	const sandboxEnvironments = environments.filter(x => x.value.type !== 'simple');
 
 	const config: Config = {
 		// Common fields
@@ -421,6 +421,12 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 			: Object.fromEntries(sandboxEnvironments.map(x => [x.value.sandboxName ?? `${x.key}`, {
 				label: x.value.label ?? ``,
 				rpcUrl: x.value.rpcUrl ?? ``,
+				// Add the following lines to preserve blockTime and baking
+				// @ts-ignore
+				...(x.value.blockTime ? { blockTime: x.value.blockTime } : {}),
+				// @ts-ignore
+				...(x.value.baking ? { baking: x.value.baking } : {}),
+				// ... rest of the existing code ...
 				// Unknown fields might need to be in the network or sandbox
 				...getUnknownFields(x, 'sandbox') as {},
 				...(() => {

@@ -550,7 +550,10 @@ const bakeTask = (parsedArgs: ValidOpts) =>
 							`docker exec ${containerName} octez-client rpc get /chains/main/mempool/pending_operations`,
 						);
 						const ops = JSON.parse(stdout);
-						if (Array.isArray(ops.applied) && ops.applied.length > 0) break;
+						if (
+							(Array.isArray(ops.applied) && ops.applied.length > 0)
+							|| (Array.isArray(ops.validated) && ops.validated.length > 0)
+						) break;
 					}
 
 					await spawnCmd(`docker exec ${containerName} octez-client bake for baker0`);
