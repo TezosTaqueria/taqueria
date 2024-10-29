@@ -48,7 +48,7 @@ export const getCheckFileExistenceCommand = async (parsedArgs: UnionOpts, source
 	if (!projectDir) throw `No project directory provided`;
 	const arch = getArchSync();
 	const baseCmd =
-		`docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${getClientDockerImage()} ls`;
+		`docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} --entrypoint /bin/ls ${getClientDockerImage()}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const cmd = `${baseCmd} ${inputFile}`;
 	return cmd;

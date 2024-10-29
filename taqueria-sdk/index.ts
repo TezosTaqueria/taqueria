@@ -253,13 +253,15 @@ export const sendAsyncRes = (msg: string, newline = true): Promise<void> => Prom
 export const sendErr = (msg: string, newline = true) => {
 	if (!msg || msg.length === 0) return;
 	const output = newline ? msg + '\n' : msg;
-	return process.stderr.write(output) as unknown as void;
+	process.stderr.write(output);
+	return output;
 };
 
 export const sendWarn = (msg: string, newline = true) => {
 	if (!msg || msg.length === 0) return;
 	const output = newline ? msg + '\n' : msg;
-	return process.stderr.write(output) as unknown as void;
+	process.stderr.write(output);
+	return output;
 };
 
 export const sendAsyncErr = (msg: string, newline = true) => Promise.reject(sendErr(msg, newline)); // should this be Promise.reject?
@@ -773,7 +775,7 @@ export const getContracts = (regex: RegExp, config: Protocol.LoadedConfig.t) => 
 	);
 };
 
-const joinPaths = (...paths: string[]): string => paths.join('/');
+export const joinPaths = (...paths: string[]): string => paths.join('/');
 export const stringToSHA256 = (s: string) => SHA256.toSHA256(s);
 
 const getPackageName = () => {

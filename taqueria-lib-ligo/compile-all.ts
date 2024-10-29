@@ -28,7 +28,7 @@ const compileAll = async (commonObj: Common, parsedArgs: Opts): Promise<void> =>
 	return Promise.all(compilePromises)
 		.then(tables => tables.flat())
 		.then(sendJsonRes)
-		.catch(err => sendErr(err, false));
+		.catch(err => sendErr(err, false) as void);
 };
 
 export default compileAll;

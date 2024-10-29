@@ -4,6 +4,7 @@ import {
 	getArch,
 	getContractContent,
 	getParameter,
+	joinPaths,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
@@ -71,6 +72,11 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
 	getCheckFileExistenceCommand(parsedArgs, sourceFile)
 		.then(execCmd)
+		.catch(_ =>
+			Promise.reject(
+				new Error(`${joinPaths(parsedArgs.config.artifactsDir ?? 'artifacts', sourceFile)} does not exist`),
+			)
+		)
 		.then(() =>
 			retrySimulateCmd(parsedArgs, sourceFile, 0)
 				.then(({ stdout, stderr }) => {
