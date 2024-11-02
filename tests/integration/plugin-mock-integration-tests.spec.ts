@@ -22,8 +22,14 @@ describe('Unit tests using taqueria-mock-plugin', () => {
 	});
 
 	test('Verify that proxied requests with no encoding output valid string', () => {
-		const stdout = execSync(`cd ./${testProjectPath} && taq ping`).toString().trim();
-		expect(stdout).toEqual('pong');
+		try {
+			const result = execSync(`cd ./${testProjectPath} && taq ping`, { stdio: 'pipe' });
+			const stdout = result.toString().trim();
+			expect(stdout).toEqual('pong');
+		} catch (error) {
+			console.log('Full error output:', error);
+			throw error;
+		}
 	});
 
 	test('Verify that proxied requests with no encoding return error', () => {
