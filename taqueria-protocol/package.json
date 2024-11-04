@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.62.6",
+	"version": "0.62.7",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -10,7 +10,7 @@
 		"build-zod": "pnpm exec ts-to-zod types.ts out/types-zod.ts",
 		"postbuild-zod": "pnpm exec ts-node scripts/post-ts-to-zod.ts",
 		"build-type-models": "pnpm exec ts-node scripts/build-types.ts",
-		"build-types": "pnpm run build-zod && pnpm run build-zod && pnpm run build-type-models"
+		"build-types": "pnpm run build-zod && pnpm run build-type-models"
 	},
 	"keywords": [
 		"taqueria",
