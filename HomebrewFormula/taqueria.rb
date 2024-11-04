@@ -5,7 +5,7 @@ class Taqueria < Formula
     head "https://github.com/tezostaqueria/taqueria.git", :branch => "main"
     url "https://github.com/tezostaqueria/taqueria/archive/refs/tags/v0.61.0.tar.gz"
   
-    depends_on "node"
+    depends_on "node@20"
     depends_on "deno"
     depends_on "pnpm"
   
