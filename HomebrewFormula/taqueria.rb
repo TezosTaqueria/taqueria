@@ -1,9 +1,9 @@
 class Taqueria < Formula
     desc "Extensible, open-source plugin-based framework and task runner for Tezos development with a CLI and a library of plugins."
     homepage "https://taqueria.io"
-    version "0.61"
+    version "0.65"
     head "https://github.com/tezostaqueria/taqueria.git", :branch => "main"
-    url "https://github.com/tezostaqueria/taqueria/archive/refs/tags/v0.61.0.tar.gz"
+    url "https://github.com/tezostaqueria/taqueria/archive/refs/tags/v0.62.5.tar.gz"
   
     depends_on "node@20"
     depends_on "deno"
@@ -12,8 +12,8 @@ class Taqueria < Formula
     def install
         # Append the path to npm to the PATH environment variable
         ENV["PATH"] = "/usr/local/bin:#{ENV["PATH"]}"
-        ENV['TAQ_VERSION'] = '0.61.0'
-        ENV['TAQ_BUILD'] = '0.61.0'
+        ENV['TAQ_VERSION'] = '0.62.5'
+        ENV['TAQ_BUILD'] = '0.62.5'
 
         # Install npm dependencies
         system "pnpm install >install.log 2>&1"
