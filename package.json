@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.64.1",
+	"version": "0.64.2",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {

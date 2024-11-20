@@ -12,7 +12,7 @@ import {
 	updateAddressAlias,
 } from '@taqueria/node-sdk';
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
-import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
+import { OriginationWalletOperation, TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import { basename, extname, join } from 'path';
 import {
@@ -99,17 +99,25 @@ const createBatchForOriginate = (
 const performOriginateOps = async (
 	tezos: TezosToolkit,
 	env: string,
-	contractsInfo: ContractInfo[],
+	contractsInfo: ContractInfo,
 	maxTimeout: number,
 	isSandbox = false,
 	gasLimit?: number,
 	storageLimit?: number,
 	fee?: number,
-): Promise<BatchWalletOperation> => {
-	const batch = createBatchForOriginate(tezos, contractsInfo, gasLimit, storageLimit, fee);
-
+): Promise<OriginationWalletOperation> => {
 	try {
-		const op = await batch.send();
+		const result = await tezos.wallet.originate({
+			code: contractsInfo.code,
+			init: contractsInfo.initStorage,
+			balance: contractsInfo.mutezTransfer.toString(),
+			mutez: true,
+			fee,
+			gasLimit,
+			storageLimit,
+		});
+
+		const op = await result.send();
 		await op.confirmation(isSandbox ? 1 : 3);
 		return op;
 	} catch (err) {
@@ -121,7 +129,7 @@ const prepContractInfoForDisplay = async (
 	parsedArgs: Opts,
 	tezos: TezosToolkit,
 	contractInfo: ContractInfo,
-	op: BatchWalletOperation,
+	op: OriginationWalletOperation,
 ): Promise<TableRow> => {
 	const protocolArgs = RequestArgs.create(parsedArgs);
 	const operationResults = await op.operationResults();
@@ -164,7 +172,7 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 		const op = await performOriginateOps(
 			tezos,
 			getCurrentEnvironment(protocolArgs),
-			[contractInfo],
+			contractInfo,
 			parsedArgs.timeout,
 			envType !== 'Network',
 			parsedArgs.gasLimit,

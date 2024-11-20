@@ -83,8 +83,64 @@ function getErrorMessage(prefix: string, error: unknown): string {
 }
 
 /**
- * Executes a shell command and standardizes error handling.
+ * Creates a command runner with optional logging capability
  */
+function createCommandRunner(enableLogging: boolean = false) {
+	const logFile = path.join(process.cwd(), 'tezbox-commands.log');
+
+	async function logExecution(sections: Record<string, string>): Promise<void> {
+		if (!enableLogging) return;
+
+		const logEntry = Object.entries(sections)
+			.map(([header, content]) =>
+				[
+					`\n=== ${header} ===`,
+					content || '[no content]',
+				].join('\n')
+			)
+			.join('\n');
+
+		await fs.promises.appendFile(logFile, logEntry + '\n\n');
+	}
+
+	/**
+	 * Executes a shell command and standardizes error handling.
+	 */
+	return async function runCommand(
+		cmd: string,
+		stderrHandler?: (stderr: string) => void | Promise<void>,
+	): Promise<{ stdout: string }> {
+		await logExecution({ COMMAND: cmd });
+
+		try {
+			const { stdout, stderr } = await execCmd(cmd);
+
+			await logExecution({
+				STDOUT: stdout,
+				STDERR: stderr.trim(),
+			});
+
+			if (stderr.trim()) {
+				if (stderrHandler) {
+					await stderrHandler(stderr.trim());
+				} else {
+					throw new Error(stderr.trim());
+				}
+			}
+			return { stdout };
+		} catch (error) {
+			await logExecution({
+				ERROR: error instanceof Error ? error.message : String(error),
+			});
+
+			throw new Error(getErrorMessage(`Command failed`, error));
+		}
+	};
+}
+
+// Create the runCommand function with logging enabled or disabled
+// const runCommand = createCommandRunner(true); // Set to false to disable logging
+
 /**
  * Executes a shell command and standardizes error handling.
  */
@@ -92,7 +148,6 @@ async function runCommand(
 	cmd: string,
 	stderrHandler?: (stderr: string) => void | Promise<void>,
 ): Promise<{ stdout: string }> {
-	// logger.info(`Executing command: ${cmd}`);
 	try {
 		const { stdout, stderr } = await execCmd(cmd);
 		if (stderr.trim()) {
@@ -727,11 +782,14 @@ async function getProtocolMappings(taskArgs: Opts): Promise<ProtocolMapping[]> {
  */
 async function getOctezClientProtocols(taskArgs: Opts): Promise<string[]> {
 	const image = getImage(taskArgs);
-	const cmd = `docker run --rm --entrypoint octez-client ${image} -M mockup list mockup protocols`;
+	const cmd = `docker run --rm --entrypoint octez-client ${image} list mockup protocols`;
 	const { stdout } = await runCommand(cmd, stderr => {
-		const ignorableError = 'Base directory /tezbox/data/.tezos-client does not exist.';
+		const ignorableError = [
+			'Base directory /tezbox/data/.tezos-client does not exist.',
+			'Unable to connect to the node: "Unix.Unix_error(Unix.ECONNREFUSED, "connect", "")"',
+		];
 
-		if (stderr.trim() !== '' && !stderr.includes(ignorableError)) {
+		if (stderr.trim() !== '' && !ignorableError.some(err => stderr.includes(err))) {
 			throw new Error(`Failed to list protocols: ${stderr.trim()}`);
 		}
 	});

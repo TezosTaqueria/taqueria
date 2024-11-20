@@ -853,7 +853,8 @@ export const Plugin = {
 					}
 				}
 				process.exit(1);
-			});
+			})
+			.then(() => process.exit());
 	},
 };
 
