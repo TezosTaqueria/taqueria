@@ -123,19 +123,24 @@ const filterDockerImageMessages = (stderr: string) => {
 	return filteredStderr;
 };
 
-export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdout: string; stderr: string }> =>
+export const execCmd = (
+	cmd: string,
+	stdErrFilter?: (stderr: string) => string,
+): LikeAPromise<StdIO, ExecException & { stdout: string; stderr: string }> =>
 	new Promise((resolve, reject) => {
 		// Escape quotes in the command, given that we're wrapping in quotes
 		const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
 		exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
-			const filteredStderr = filterShellCmdStderr(stderr); // Filter the stderr
+			// Apply custom filter first, then the shell filter
+			const customFiltered = stdErrFilter ? stdErrFilter(stderr) : stderr;
+			const filteredStderr = filterShellCmdStderr(customFiltered);
 
 			if (err) {
-				reject(toExecErr(err, { stderr: filteredStderr, stdout })); // Use the filtered stderr
+				reject(toExecErr(err, { stderr: filteredStderr, stdout }));
 			} else {
 				resolve({
 					stdout,
-					stderr: filteredStderr, // Use the filtered stderr
+					stderr: filteredStderr,
 				});
 			}
 		});

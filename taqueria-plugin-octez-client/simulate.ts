@@ -12,10 +12,9 @@ import {
 } from '@taqueria/node-sdk';
 import { basename, extname } from 'path';
 import {
+	execOctezClient,
 	getCheckFileExistenceCommand,
-	getClientDockerImage,
 	getInputFilename,
-	GLOBAL_OPTIONS,
 	SimulateOpts as Opts,
 	trimTezosClientMenuIfPresent,
 } from './common';
@@ -39,9 +38,6 @@ const getDefaultStorageFilename = (contractName: string): string => {
 };
 
 const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<string> => {
-	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
-	if (!projectDir) throw `No project directory provided`;
-
 	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(sourceFile);
 	const storage = (await getContractContent(parsedArgs, storageFilename))?.trim();
 
@@ -58,15 +54,10 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const paramFilename = parsedArgs.param!;
 	const param = (await getParameter(parsedArgs, paramFilename)).trim();
 
-	const arch = await getArch();
-	const flextesaImage = getClientDockerImage();
-	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
 
-	const cmd =
-		`${baseCmd} octez-client ${GLOBAL_OPTIONS} run script ${inputFile} on storage \'${storage}\' and input \'${param}\' ${entrypoint}`;
-	return cmd;
+	return `run script ${inputFile} on storage '${storage}' and input '${param}' ${entrypoint}`;
 };
 
 const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
@@ -113,7 +104,7 @@ const retrySimulateCmd = (
 	const max_retries = 3;
 	const relay_delay_ms = 1000;
 	return getSimulateCmd(parsedArgs, sourceFile)
-		.then(execCmd)
+		.then(cmd => execOctezClient(cmd, parsedArgs.projectDir))
 		.catch(err => {
 			if (retryCount < max_retries && err.stderr.includes('503 Service Temporarily')) {
 				const delay = relay_delay_ms * Math.pow(2, retryCount);

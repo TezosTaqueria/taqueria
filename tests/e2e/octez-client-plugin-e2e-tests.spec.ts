@@ -91,8 +91,8 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout1, stderr } = await execute('taq', 'typecheck no_such_contract.tz', './test-project');
-		expect(stdout1.join()).toContain('Invalid');
+		const result = await execute('taq', 'typecheck no_such_contract.tz', './test-project');
+		expect(result.stderr.join()).toContain('No such file or directory');
 
 		await cleanup();
 	});
@@ -150,12 +150,12 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
-		const { stdout: stdout1 } = await execute(
+		const result = await execute(
 			'taq',
 			'simulate no_such_contract.tz --param integerParameter10.tz --storage anyContract.storage.tz',
 			'./test-project',
 		);
-		expect(stdout1.join()).toContain('Invalid');
+		expect(result.stderr.join()).toContain('does not exist');
 
 		await cleanup();
 	});
