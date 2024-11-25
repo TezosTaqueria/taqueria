@@ -34,8 +34,8 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		expect(stdout2).toEqual(expect.arrayContaining([expect.stringContaining('packages')]));
 		await new Promise(r => setTimeout(r, 750));
 
-		const { stdout: stdout3 } = await execute('taq', 'create contract-test --help', './test-project');
-		expect(stdout3).toEqual(expect.arrayContaining(['Create files from pre-existing templates']));
+		const result = await execute('taq', 'create contract-test', './test-project');
+		expect(result.stderr.join()).toContain('Create files from pre-existing templates');
 
 		await cleanup();
 	});
