@@ -1,7 +1,6 @@
 export * from '@taqueria/protocol/types';
 import * as Protocol from '@taqueria/protocol';
 import { quote as shellEscape } from 'shell-quote';
-import whyIsNodeRunning from 'why-is-node-running';
 export {
 	Config,
 	EconomicalProtocolHash,
