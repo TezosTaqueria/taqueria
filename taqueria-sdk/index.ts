@@ -1,6 +1,7 @@
 export * from '@taqueria/protocol/types';
 import * as Protocol from '@taqueria/protocol';
 import { quote as shellEscape } from 'shell-quote';
+import whyIsNodeRunning from 'why-is-node-running';
 export {
 	Config,
 	EconomicalProtocolHash,
@@ -477,7 +478,7 @@ const getResponse =
 					const template = schema.templates?.find((tmpl: Protocol.Template.t) => tmpl.template === proxyArgs.template);
 					if (template) {
 						if (typeof template.handler === 'function') {
-							return template.handler(proxyArgs);
+							return await template.handler(proxyArgs);
 						}
 						return Promise.reject({
 							errCode: 'E_NOT_SUPPORTED',
@@ -859,7 +860,9 @@ export const Plugin = {
 				}
 				process.exit(1);
 			})
-			.then(() => process.exit());
+			.then(() => {
+				setTimeout(() => process.exit(0), 200);
+			});
 	},
 };
 
