@@ -7,6 +7,7 @@ import smartpy
 import os
 import shutil
 import traceback
+import debugpy
 
 first_run = True  # Flag to ensure `__taq_compile__` only runs once
 found_modules = []  # To hold the found SmartPy modules
@@ -153,22 +154,74 @@ def get_storage_exprs(storage_module):
     return storage_exprs
 
 def does_contract_require_initial_storage(contractName, mod):
-    # The module has a sexpr property that looks like this:
-    # '((Some ("tests/e2e/data/smartpy-data/minimal.py" 6)) module main ((Some ("tests/e2e/data/smartpy-data/minimal.py" 6)) contract_def MyContract () (((Some ("tests/e2e/data/smartpy-data/minimal.py" 7)) method init () (())) ((Some ("tests/e2e/data/smartpy-data/minimal.py" 11)) method (entrypoint entrypoint_1) () (())))))'
-    #
-    # We need to extract the substring of the sexpr that starts with "contract_def [contractName]" up till the end of the sexpr or the next "contract_def" substring
-    # Then, we need to check if the substring contains "method init ()". If so, the contract does NOT require initial storage and this function returns false. Otherwise, we can assume the contract does require initial storage and this function returns true.
+    """
+    Determines if a SmartPy contract requires initial storage during instantiation.
+    
+    The module's sexpr (S-expression) property can come in two formats depending on SmartPy version:
+    
+    OLD FORMAT (pre-2024):
+    '((Some ("tests/data/minimal.py" 6)) module main ((Some ("tests/data/minimal.py" 6)) 
+    contract_def MyContract () (((Some ("tests/data/minimal.py" 7)) method init () (()))...))'
+    
+    NEW FORMAT (2024+):
+    ' () ((("/tmp/contracts/minimal.py" 7) method (init __init__ (None None None None None)) 
+    () (())) ...)'
+    
+    A contract requires initial storage if:
+    - In new format: The init method has parameters
+    - In old format: There is no "method init ()" present
+    """
     sexpr = mod.sexpr
+    
+    # First, try parsing with new format (2024+)
+    init_pattern = 'method (init __init__'
+    init_index = sexpr.find(init_pattern)
+    
+    if init_index != -1:
+        # New format detected - we need to analyze the parameters section
+        # The format is: method (init __init__ ...) (parameters) (body)
+        
+        # Skip past the method definition to find start of parameters
+        params_start = sexpr.find(')', init_index)
+        if params_start == -1:
+            return True  # Malformed sexpr, safer to assume storage is required
+            
+        # Find the parameter list boundaries
+        params_start = sexpr.find('(', params_start) + 1
+        params_end = sexpr.find(')', params_start)
+        
+        if params_start == -1 or params_end == -1:
+            return True  # Malformed sexpr, safer to assume storage is required
+            
+        # Extract and check parameters
+        params = sexpr[params_start:params_end].strip()
+        # If params exist (non-empty), storage is required
+        # If params are empty, no storage is required
+        return len(params) > 0
+    
+    # If new format not found, fall back to old format (pre-2024)
+    # In old format, we need to:
+    # 1. Find the specific contract definition
+    # 2. Extract just that contract's section (up to next contract_def if it exists)
+    # 3. Check for presence of "method init ()"
     focused_contract_def = f"contract_def {contractName}"
-    contract_def_index = sexpr.find(focused_contract_def)+len(focused_contract_def)
+    contract_def_index = sexpr.find(focused_contract_def)
+    
     if contract_def_index == -1:
-        return False
+        return False  # Contract not found, assume no storage required
     else:
+        # Extract the substring starting from after the contract definition
+        contract_def_index += len(focused_contract_def)
         substring = sexpr[contract_def_index:]
+        
+        # Look for next contract definition (if any) to limit our search
         next_contract_def_index = substring.find("contract_def")
+        
         if next_contract_def_index == -1:
+            # No next contract, search whole remaining string
             return substring.find("method init ()") == -1
         else:
+            # Only search up to the next contract definition
             return substring[:next_contract_def_index].find("method init ()") == -1
 
 def __taq_compile__():

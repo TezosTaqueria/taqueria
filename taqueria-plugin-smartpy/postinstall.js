@@ -78,7 +78,7 @@ const checkSmartPy = async (pythonCheck, pipCheck) => {
     if (parseFloat(version.split(' ')[1].replace('a', '')) >= 0.19) return '✔';
   } catch {
     try {
-      await runCommand('pip install https://smartpy.io/static/tezos_smartpy-0.19.1-py3-none-any.whl');
+      await runCommand('pip install https://smartpy.io/static/tezos_smartpy-0.20.0-py3-none-any.whl');
       return '✔';
     } catch {
       console.log('Failed to install SmartPy.');
