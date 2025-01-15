@@ -7,7 +7,6 @@ import smartpy
 import os
 import shutil
 import traceback
-import debugpy
 
 first_run = True  # Flag to ensure `__taq_compile__` only runs once
 found_modules = []  # To hold the found SmartPy modules
