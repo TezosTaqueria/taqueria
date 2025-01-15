@@ -708,7 +708,7 @@
 		"test": "./bin/run-tests.sh"
 	},
 	"devDependencies": {
-		"@taquito/taquito": "20.2.0-beta.0",
+		"@taquito/taquito": "21.0.0",
 		"@types/fs-extra": "^11.0.4",
 		"@types/glob": "^8.1.0",
 		"@types/mocha": "^10.0.6",
@@ -727,7 +727,7 @@
 		"@microsoft/signalr": "^8.0.0",
 		"@taqueria/analytics": "workspace:*",
 		"@taqueria/protocol": "workspace:*",
-		"@taquito/rpc": "20.2.0-beta.0",
+		"@taquito/rpc": "21.0.0",
 		"cli-table3": "^0.6.3",
 		"comment-json": "^4.2.3",
 		"eventsource": "^2.0.2",
