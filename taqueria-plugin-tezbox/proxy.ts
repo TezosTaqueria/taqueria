@@ -630,7 +630,7 @@ function constructDockerRunCommand(params: DockerRunParams): string {
 		`--name ${containerName}`,
 		`-v "${configDir}:/tezbox/overrides"`,
 		image,
-		// 'qenabox', // TODO: restore once working upstream
+		'quebecbox',
 	];
 
 	return dockerOptions.join(' ');

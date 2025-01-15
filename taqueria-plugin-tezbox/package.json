@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-tezbox",
-	"version": "0.65.3",
+	"version": "0.65.4",
 	"description": "A plugin for Taqueria providing local sandbox capabilities built on TezBox",
 	"keywords": [
 		"taqueria",
