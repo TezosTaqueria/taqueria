@@ -513,7 +513,7 @@ export type NetworkAccountConfig = {
 };
 
 export type SandboxAccountConfig = {
-	encryptedKey: NonEmptyString;
+	encryptedKey?: NonEmptyString;
 	publicKeyHash: PublicKeyHash;
 	secretKey: NonEmptyString;
 };

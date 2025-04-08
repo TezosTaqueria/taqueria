@@ -178,18 +178,20 @@ function isTezBoxEnvironment(taskArgs: Opts): boolean {
 }
 
 /**
- * Throws warning indicating function is not implemented yet.
+ * Creates a Tezos account with the specified name and balance.
  */
 async function instantiateDeclaredAccount(
 	declaredAccountName: string,
 	balanceInMutez: BigNumber,
 ): Promise<InstantiatedAccount> {
-	logger.warn(`instantiateDeclaredAccount is not implemented. Returning dummy data for ${declaredAccountName}.`);
-	// Return dummy data or default values
+	// Generate a new account using BIP39 and Tezos key derivation
+	const account = await createNewAccount();
+
+	// Return the instantiated account with real credentials
 	return {
-		encryptedKey: 'unencrypted:edpktdummykey123',
-		publicKeyHash: `tz1_dummy_public_key_hash_${declaredAccountName}`,
-		secretKey: 'unencrypted:edskdummysecretkey123',
+		encryptedKey: `unencrypted:${account.pk}`,
+		publicKeyHash: account.pkh,
+		secretKey: account.sk,
 	};
 }
 
@@ -630,7 +632,7 @@ function constructDockerRunCommand(params: DockerRunParams): string {
 		`--name ${containerName}`,
 		`-v "${configDir}:/tezbox/overrides"`,
 		image,
-		'quebecbox',
+		'riobox',
 	];
 
 	return dockerOptions.join(' ');
