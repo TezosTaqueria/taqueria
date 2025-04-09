@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-archetype",
-	"version": "0.68.4",
+	"version": "0.68.5",
 	"description": "A taqueria plugin for compiling Archetype smart contracts",
 	"targets": {
 		"default": {
@@ -46,7 +46,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^22.7.5",
-		"tsup": "^8.3.0",
+		"tsup": "^8.4.0",
 		"typescript": "^5.6.2"
 	},
 	"tsup": {

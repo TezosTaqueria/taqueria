@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.68.4",
+	"version": "0.68.5",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -48,13 +48,13 @@
 		"chokidar-cli": "^3.0.0",
 		"dprint": "^0.45.0",
 		"husky": "^9.0.11",
-		"lerna": "^8.1.8",
+		"lerna": "^8.2.1",
 		"lint-staged": "^15.2.10",
 		"module-alias": "^2.2.3",
 		"patch-package": "^8.0.0",
-		"pnpm": "^9.12.1",
+		"pnpm": "^9.15.1",
 		"ts-node": "^10.9.2",
-		"tsup": "^8.0.2",
+		"tsup": "^8.4.0",
 		"typescript": "^5.3.3"
 	},
 	"pnpm": {
@@ -62,7 +62,10 @@
 			"glob": "^11.0.0",
 			"rimraf": "^5.0.5",
 			"whatwg-url": "^14.0.0",
-			"@taqueria/node-sdk>node-fetch": "^3.3.2"
+			"@taqueria/node-sdk>node-fetch": "^3.3.2",
+			"undici": "^6.21.1",
+			"keytar": "^7.9.1",
+			"cross-spawn": "^7.0.5"
 		}
 	},
 	"lint-staged": {
@@ -73,5 +76,8 @@
 			"npx dprint fmt --config ./dprint.json"
 		],
 		"*.json": "npx dprint fmt --config ./dprint.json"
+	},
+	"dependencies": {
+		"elliptic": "^6.6.0"
 	}
 }

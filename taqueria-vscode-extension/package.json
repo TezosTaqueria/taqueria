@@ -3,7 +3,7 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "TezosTaqueria",
-	"version": "0.68.4",
+	"version": "0.68.5",
 	"private": true,
 	"engines": {
 		"vscode": "^1.84.2"
@@ -717,8 +717,8 @@
 		"@types/semver": "^7.5.6",
 		"@types/vscode": "^1.84.2",
 		"@vscode/test-electron": "^2.3.9",
-		"@vscode/vsce": "^3.1.1",
-		"esbuild": "^0.20.0",
+		"@vscode/vsce": "^3.3.2",
+		"esbuild": "^0.25.2",
 		"fs-extra": "^11.2.0",
 		"glob": "^11.0.0",
 		"typescript": "^5.6.2"

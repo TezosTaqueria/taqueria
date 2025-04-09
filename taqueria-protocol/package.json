@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.68.4",
+	"version": "0.68.5",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -41,7 +41,7 @@
 		"@types/shell-quote": "^1.7.5",
 		"esbuild-plugin-text-replace": "^1.3.0",
 		"ts-to-zod": "^3.13.0",
-		"tsup": "^8.3.0",
+		"tsup": "^8.4.0",
 		"typescript": "^5.6.2"
 	},
 	"exports": {
@@ -325,9 +325,9 @@
 		"@taquito/taquito": "22.0.0-beta.0",
 		"@taquito/utils": "22.0.0-beta.0",
 		"batching-toposort": "^1.2.0",
-		"esbuild": "^0.20.0",
+		"esbuild": "^0.25.2",
 		"fluture": "^14.0.0",
-		"i18next": "^23.15.1",
+		"i18next": "^24.2.3",
 		"node-fetch": "^3.3.2",
 		"rambda": "^9.3.0",
 		"rambdax": "^11.2.0",

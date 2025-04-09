@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-jest",
-	"version": "0.68.4",
+	"version": "0.68.5",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",
@@ -27,6 +27,7 @@
 		"directory": "taqueria-plugin-jest"
 	},
 	"dependencies": {
+		"@babel/helpers": "^7.27.0",
 		"@taqueria/node-sdk": "workspace:*",
 		"@taqueria/plugin-contract-types": "workspace:*",
 		"@taquito/signer": "22.0.0-beta.0",
@@ -41,7 +42,7 @@
 	"devDependencies": {
 		"@types/async-retry": "^1.4.8",
 		"@types/node": "^22.7.4",
-		"tsup": "^8.3.0",
+		"tsup": "^8.4.0",
 		"typescript": "^5.6.2"
 	},
 	"tsup": {
