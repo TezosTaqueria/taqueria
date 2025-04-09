@@ -46,7 +46,8 @@
 		"development": {
 			"type": "flextesa",
 			"label": "Local Tezos Sandbox",
-			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"rpcUrl": "http://localhost:21000"
 		},
 		"testing": {
 			"type": "simple",
