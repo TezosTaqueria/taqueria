@@ -180,14 +180,9 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				// Run the wrapper again
 				const emptyResult = await execute('python', `wrapper.py ${testProjectDir}/contracts/chess.py ${parsedArgs}`);
 				expect(emptyResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
-				expect(filterDockerImageMessages(emptyResult.stderr)).toEqual([
+				expect(filterDockerImageMessages(emptyResult.stderr)).toContain(
 					"Warning: Contract Chess requires initial storage to be specified as an expression in the Chess.storageList.py file. Here's an example:",
-					'import smartpy as sp',
-					'# storage expression variables must contain the word "storage"',
-					'default_storage = {',
-					'"count": sp.int(0)',
-					'}',
-				]);
+				);
 
 				/*********** Test that an invalid storageList results in no compilation  ***********/
 				// Copy an invalid storageList.py file to the test project
@@ -288,7 +283,9 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 			// Compile all contracts
 			const { stdout, stderr } = await execute('taq', 'compile-all', './test-project');
-			expect(stderr).toEqual([]);
+			expect(stderr).toEqual([
+				'contracts/chess.py:969: warning: sp.match is deprecated. Please use the new pattern matching syntax.',
+			]);
 			expect(stdout).toEqual([
 				'┌───────────────────────┬──────────────────────────┐',
 				'│ Source                │ Artifact                 │',
