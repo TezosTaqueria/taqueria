@@ -254,12 +254,16 @@ export const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 =
 			}
 
 			// Everything except label and protocol is local for sandbox
-			if (eMain.type === 'flextesa') {
+			if (eMain.type === 'flextesa' || eMain.type === 'tezbox') {
 				if (
 					k === 'label'
 					|| k === 'protocol'
 				) {
 					delete eLocal[key];
+					continue;
+				}
+				// For flextesa/tezbox, keep rpcUrl in both files
+				if (k === 'rpcUrl') {
 					continue;
 				}
 			}
