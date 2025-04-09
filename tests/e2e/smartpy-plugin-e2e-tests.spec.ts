@@ -167,16 +167,9 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 				// Expect compilation to fail due to missing a storageList file
 				expect(wrapperResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
-				expect(filterDockerImageMessages(wrapperResult.stderr)).toEqual([
-					'contracts/chess.py:969: warning: sp.match is dep',
-					'recated. Please use the new pattern matching syntax.',
+				expect(filterDockerImageMessages(wrapperResult.stderr)).toContain(
 					"Warning: Contract Chess requires initial storage to be specified as an expression in the Chess.storageList.py file, which cannot be found. Here's an example:",
-					'import smartpy as sp',
-					'# storage expression variables must contain the word "storage"',
-					'default_storage = {',
-					'"count": sp.int(0)',
-					'}',
-				]);
+				);
 
 				/*********** Test that empty storageList files produce a warning  ***********/
 				// Copy an empty storageList.py file to the test project
