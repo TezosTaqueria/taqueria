@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-octez-client",
-	"version": "0.68.10",
+	"version": "0.69.0",
 	"description": "A taqueria plugin for utilizing octez-client",
 	"targets": {
 		"default": {
