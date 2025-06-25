@@ -135,7 +135,8 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				const { execute, cleanup, exists, makeDir, path: testProjectDir } = await prepareEnvironment();
 				const { readFile, writeFile } = require('fs').promises;
 				const pipResult = await exec(
-					'pip install https://smartpy.io/static/tezos_smartpy-0.21.1-py3-none-any.whl',
+					'pip install https://smartpy.io/static/tezos_smartpy-0.22.0-py3-none-any.whl',
+					{ cwd: testProjectDir },
 				);
 				expect(pipResult.stderr.trim().split('\n').filter(l => !l.includes('pip') && l.length > 0)).toEqual([]);
 
