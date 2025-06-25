@@ -75,10 +75,10 @@ const checkSmartPy = async (pythonCheck, pipCheck) => {
 
   try {
     const version = await runCommand('pip show smartpy | grep Version');
-    if (parseFloat(version.split(' ')[1].replace('a', '')) >= 0.19) return '✔';
+    if (parseFloat(version.split(' ')[1].replace('a', '')) >= 0.22) return '✔';
   } catch {
     try {
-      await runCommand('pip install https://smartpy.io/static/tezos_smartpy-0.21.1-py3-none-any.whl');
+      await runCommand('pip install https://smartpy.io/static/tezos_smartpy-0.22.0-py3-none-any.whl');
       return '✔';
     } catch {
       console.log('Failed to install SmartPy.');
@@ -99,7 +99,7 @@ const main = async () => {
   console.log(`[${dockerCheck}] docker`);
   console.log(`[${pythonCheck}] python 3.10 or greater`);
   console.log(`[${pipCheck}] pip`);
-  console.log(`[${smartPyCheck}] smartpy v0.19.0a0 or greater`);
+  console.log(`[${smartPyCheck}] smartpy v0.22.0 or greater`);
   console.log('')
 };
 
