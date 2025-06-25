@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/node-sdk",
-	"version": "0.70.0",
+	"version": "0.70.1",
 	"description": "A TypeScript SDK for NodeJS used for Taqueria plugin development.",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -39,9 +39,9 @@
 	"dependencies": {
 		"@babel/runtime": "^7.27.0",
 		"@taqueria/protocol": "workspace:*",
-		"@taquito/signer": "22.0.0-beta.0",
-		"@taquito/taquito": "22.0.0-beta.0",
-		"@taquito/utils": "22.0.0-beta.0",
+		"@taquito/signer": "22.0.0",
+		"@taquito/taquito": "22.0.0",
+		"@taquito/utils": "22.0.0",
 		"bip39": "^3.1.0",
 		"fluture": "^14.0.0",
 		"i18next": "^23.15.1",
