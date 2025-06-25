@@ -6,6 +6,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { join, resolve } from 'path';
 
 const OUTFILE = resolve(join(__dirname, '../', 'out/types-zod.ts'));
+const TSC_PATH = resolve(join(__dirname, '../', 'node_modules/.bin/tsc'));
 const TSCONFIG = resolve(join(__dirname, '../', 'tsconfig.json'));
 const PASSTHROUGH_TYPES = [
 	'RequestArgs',
@@ -49,7 +50,7 @@ const toPassthroughSchemas = (fileContents: string) =>
 // Ensure that the output is valid TypeScript
 const ensureValidTS = () =>
 	new Promise<void>((resolve, reject) =>
-		exec(`npx tsc --noEmit --skipLibCheck ${OUTFILE}`, (error, stdout, stderr) => {
+		exec(`${TSC_PATH} --noEmit --skipLibCheck ${OUTFILE}`, (error, stdout, stderr) => {
 			if (stderr) reject(stderr);
 			else if (error) reject(stdout ? stdout : error);
 			else resolve();
