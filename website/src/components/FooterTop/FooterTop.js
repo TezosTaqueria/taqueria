@@ -3,14 +3,7 @@ import clsx from "clsx";
 import styles from "./FooterTop.module.css";
 
 // TODO: Adjust for Taqueria
-const FeatureList = [
-	{
-		title: "Built By",
-		Svg: require("../../../static/img/ECAD_logo.svg").default,
-		url: "https://taqueria.io/",
-	},
-	,
-];
+const FeatureList = [];
 
 function Feature({ Svg, title, url }) {
 	return (
