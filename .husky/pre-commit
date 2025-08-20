@@ -15,7 +15,7 @@ else
   git add ./deno.lock
 
   # Bump version # for alpha release (with timeout to prevent hanging)
-  timeout 15s pnpm exec lerna version patch --no-git-tag-version --no-push --yes --force-publish --no-private || echo "Version bump completed or timed out"
+  timeout 15s pnpm exec lerna version patch --no-git-tag-version --no-push --yes --force-publish || echo "Version bump completed or timed out"
   
   # Add any version changes that were made
   git add */package*.json package*.json lerna.json 2>/dev/null || true
