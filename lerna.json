@@ -1,17 +1,17 @@
 {
-	"$schema": "node_modules/lerna/schemas/lerna-schema.json",
-	"version": "0.73.6",
-	"packages": [
-		"taqueria-protocol",
-		"taqueria-lib*",
-		"taqueria-plugin*",
-		"taqueria-sdk",
-		"taqueria-toolkit",
-		"taqueria-analytics",
-		"taqueria-vscode*",
-		"tests",
-		"."
-	],
-	"npmClient": "pnpm",
-	"useNx": false
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "version": "0.73.7",
+  "packages": [
+    "taqueria-protocol",
+    "taqueria-lib*",
+    "taqueria-plugin*",
+    "taqueria-sdk",
+    "taqueria-toolkit",
+    "taqueria-analytics",
+    "taqueria-vscode*",
+    "tests",
+    "."
+  ],
+  "npmClient": "pnpm",
+  "useNx": false
 }

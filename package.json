@@ -48,7 +48,7 @@
 		"chokidar-cli": "^3.0.0",
 		"dprint": "^0.45.0",
 		"husky": "^9.0.11",
-		"lerna": "^8.2.1",
+		"lerna": "^8.2.3",
 		"lint-staged": "^15.2.10",
 		"module-alias": "^2.2.3",
 		"patch-package": "^8.0.0",
