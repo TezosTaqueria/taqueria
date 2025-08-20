@@ -632,7 +632,7 @@ function constructDockerRunCommand(params: DockerRunParams): string {
 		`--name ${containerName}`,
 		`-v "${configDir}:/tezbox/overrides"`,
 		image,
-		'riobox',
+		'S',
 	];
 
 	return dockerOptions.join(' ');

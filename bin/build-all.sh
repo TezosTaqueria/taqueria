@@ -19,7 +19,7 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
         echo "❌ Docker is not installed, not running, or the user needs permission."
         exit $errorCode
     fi
-    if [ -n `which deno || ""` ]; then
+    if which deno > /dev/null 2>&1; then
         echo "Deno installed!"
         VERSION=$(deno --version | awk '/deno/{print $2}' | awk -F. '{print $1"."$2}')
         MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
