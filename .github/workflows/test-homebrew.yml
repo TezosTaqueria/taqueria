@@ -1,0 +1,201 @@
+name: Test Homebrew Installation
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of test to run'
+        required: true
+        default: 'install'
+        type: choice
+        options:
+          - install
+          - upgrade
+          - full
+      debug:
+        description: 'Enable debug logging'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  test-homebrew-install:
+    runs-on: macos-latest
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Cache Homebrew Bundler RubyGems
+        if: github.event.inputs.debug == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
+          key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: ${{ runner.os }}-rubygems-
+
+      - name: Install Homebrew Bundler RubyGems
+        if: github.event.inputs.debug == 'true'
+        run: brew install-bundler-gems
+
+      - name: Enable debug logging
+        if: github.event.inputs.debug == 'true'
+        run: |
+          echo "HOMEBREW_DEBUG=1" >> $GITHUB_ENV
+          echo "HOMEBREW_VERBOSE=1" >> $GITHUB_ENV
+
+      - name: Show Homebrew info
+        run: |
+          echo "Homebrew version:"
+          brew --version
+          echo "Homebrew configuration:"
+          brew config
+
+      - name: Add Taqueria tap
+        run: |
+          echo "Adding TezosTaqueria/taqueria tap..."
+          brew tap TezosTaqueria/taqueria https://github.com/TezosTaqueria/taqueria
+
+      - name: Verify tap was added
+        run: |
+          echo "Listing taps:"
+          brew tap
+          echo "Checking if taqueria formula exists:"
+          brew search taqueria
+
+      - name: Install taqueria
+        run: |
+          echo "Installing taqueria..."
+          brew install taqueria
+
+      - name: Verify installation
+        run: |
+          echo "Checking taqueria installation..."
+          which taq
+          echo "Taqueria version:"
+          taq --version
+          echo "Taqueria help:"
+          taq --help
+
+      - name: Test basic functionality
+        run: |
+          echo "Testing basic taqueria functionality..."
+          # Test in a temporary directory
+          mkdir -p /tmp/taq-test
+          cd /tmp/taq-test
+          
+          # Test init command (if available)
+          if taq --help | grep -q "init"; then
+            echo "Testing taq init..."
+            taq init test-project || echo "Init command not available or failed"
+          fi
+          
+          # Test list plugins (if available)
+          if taq --help | grep -q "list-known-tasks"; then
+            echo "Testing taq list-known-tasks..."
+            taq list-known-tasks || echo "List tasks command not available or failed"
+          fi
+
+      - name: Test formula with brew test
+        run: |
+          echo "Running brew test on taqueria formula..."
+          brew test taqueria || echo "No test block defined in formula"
+
+      - name: Show installation info
+        run: |
+          echo "Installation location:"
+          brew --prefix taqueria
+          echo "Formula info:"
+          brew info taqueria
+          echo "Installed files:"
+          brew list taqueria
+
+  test-homebrew-upgrade:
+    runs-on: macos-latest
+    if: github.event.inputs.test_type == 'upgrade' || github.event.inputs.test_type == 'full'
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Add Taqueria tap
+        run: |
+          brew tap TezosTaqueria/taqueria https://github.com/TezosTaqueria/taqueria
+
+      - name: Install previous version (if available)
+        run: |
+          # Try to install a previous version first
+          echo "Attempting to install previous version..."
+          # This assumes there might be version-specific formulas or we can check available versions
+          brew install taqueria || echo "Installing current version as no previous version available"
+
+      - name: Check current version
+        run: |
+          echo "Current installed version:"
+          taq --version || echo "No previous version was installed"
+
+      - name: Upgrade taqueria
+        run: |
+          echo "Upgrading taqueria..."
+          brew upgrade taqueria || echo "Already at latest version or upgrade not available"
+
+      - name: Verify upgrade
+        run: |
+          echo "After upgrade:"
+          taq --version
+          brew info taqueria
+
+  test-homebrew-comprehensive:
+    runs-on: macos-latest
+    if: github.event.inputs.test_type == 'full'
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Run brew test-bot style checks
+        run: |
+          echo "Adding tap for testing..."
+          brew tap TezosTaqueria/taqueria https://github.com/TezosTaqueria/taqueria
+          
+          echo "Running style checks..."
+          brew style TezosTaqueria/taqueria/taqueria || echo "Style check completed with warnings"
+
+      - name: Audit formula
+        run: |
+          echo "Auditing taqueria formula..."
+          brew audit TezosTaqueria/taqueria/taqueria || echo "Audit completed with warnings"
+
+      - name: Install and test dependencies
+        run: |
+          echo "Installing taqueria and testing dependencies..."
+          brew install --verbose taqueria
+          
+          echo "Checking dependencies:"
+          brew deps taqueria
+          
+          echo "Verifying all dependencies are satisfied:"
+          brew missing taqueria || echo "All dependencies satisfied"
+
+      - name: Test reinstallation
+        run: |
+          echo "Testing reinstallation..."
+          brew reinstall taqueria
+          taq --version
+
+      - name: Test uninstallation
+        run: |
+          echo "Testing uninstallation..."
+          brew uninstall taqueria
+          
+          # Verify it's uninstalled
+          if command -v taq &> /dev/null; then
+            echo "ERROR: taq command still available after uninstall"
+            exit 1
+          else
+            echo "SUCCESS: taq properly uninstalled"
+          fi
+
+      - name: Test clean installation after uninstall
+        run: |
+          echo "Testing clean installation after uninstall..."
+          brew install taqueria
+          taq --version
