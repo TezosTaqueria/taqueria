@@ -433,7 +433,7 @@ export type ConfigFileV2 = {
 	 * Example environment types:
 	 *
 	 * - a sandbox running locally (using flextesa and taquito plugin)
-	 * - teztnets.xyz (using taquito plugin)
+	 * - teztnets.com (using taquito plugin)
 	 * - mainnet (using taquito plugin with a custom rpcUrl)
 	 *
 	 * The environment implementation also implements the account types that are supported by that environmentType:
