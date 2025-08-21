@@ -7,7 +7,7 @@ if [[ -n "$TAQUERIA_DEPLOY" ]]; then
   VERSION=$(cat lerna.json | grep version | cut -d '"' -f 4)
 
   # Update the version number in the Homebrew formula (only if a stable release)
-  sed -i -e "s/\([0-9]\+\.[0-9]\+\.[0-9]+\)/${VERSION}/mg" ./HomebrewFormula/taqueria.rb
+  gemini --yolo -p "Update all occurrences of version numbers in ./HomebrewFormula/taqueria.rb to version ${VERSION}. This includes the version field, the URL with v${VERSION} tag, and the TAQ_VERSION and TAQ_BUILD environment variables."
 
 # NOT A DEPLOYMENT
 else
