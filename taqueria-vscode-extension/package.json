@@ -3,7 +3,7 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "TezosTaqueria",
-	"version": "0.76.0",
+	"version": "0.77.1",
 	"private": true,
 	"engines": {
 		"vscode": "^1.84.2"
