@@ -7,7 +7,7 @@ if [[ -n "$TAQUERIA_DEPLOY" ]]; then
   VERSION=$(cat lerna.json | grep version | cut -d '"' -f 4)
 
   # Update the version number in the Homebrew formula (only if a stable release)
-  gemini --yolo -p "Update all occurrences of version numbers in ./HomebrewFormula/taqueria.rb to version ${VERSION}. This includes the version field, the URL with v${VERSION} tag, and the TAQ_VERSION and TAQ_BUILD environment variables."
+  gemini --yolo -p "Check if version ${VERSION} is a minor or major release (ends with .0). If ${VERSION} ends with .0 (like 0.77.0, 0.78.0, or 1.0.0), then update all occurrences of version numbers in ./HomebrewFormula/taqueria.rb to version ${VERSION}. This includes the version field, the URL with v${VERSION} tag, and the TAQ_VERSION and TAQ_BUILD environment variables. If ${VERSION} is a patch release (like 0.77.1 or 0.77.2), do NOT modify the file at all."
 
 # NOT A DEPLOYMENT
 else

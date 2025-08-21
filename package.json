@@ -12,7 +12,7 @@
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
 		"build:packages": "lerna run build",
-		"deploy": "TAQUERIA_DEPLOY=1 timeout 30s pnpm exec lerna version minor --yes || true && git push && git push --tags",
+		"deploy": "./bin/deploy.sh",
 		"build-website": "cd website && npm ci --legacy-peer-deps && npm run build",
 		"serve-website": "cd website && npm run serve",
 		"deploy-website": "cd website && npm run deploy",
