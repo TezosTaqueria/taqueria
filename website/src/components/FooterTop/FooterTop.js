@@ -20,7 +20,7 @@ export default function FooterTop() {
 	return (
 		<section className={styles.features}>
 			<div className={styles.container}>
-				<Feature {...FeatureList[0]} />
+				{/* TODO: Add footer top content when FeatureList is populated */}
 			</div>
 			<div className={styles.leftPurpleLine}></div>
 			<div className={styles.rightPurpleLine}></div>

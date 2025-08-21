@@ -85,7 +85,6 @@ function Feature({
                 {link.title}
               </a>
             </div>
-            {link.tilte}
           </div>
           <Svg className={styles.featureSvg} alt={title} />
           <SvgTraiangle1 className={styles.featureSvgTraiangle1} alt={title} />
