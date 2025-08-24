@@ -739,7 +739,7 @@ export const getAccountPrivateKey = async (
 			return sendAsyncErr(
 				`A keypair with public key hash ${
 					network.accounts[account].publicKeyHash
-				} was generated for you.\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+				} was generated for you.\nTo fund this account:\n1. Go to https://teztnets.com and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
 			);
 		}
 	}
