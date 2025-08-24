@@ -120,11 +120,6 @@ const sidebars = {
         "tasks/deploy",
         "tasks/instantiate-account",
         "tasks/fund",
-        
-        // Taquito plugin tasks
-        "tasks/deploy",
-        "tasks/instantiate-account",
-        "tasks/fund",
 
         // Pinata plugin tasks
         "tasks/publish",
