@@ -16,8 +16,8 @@ import {
 	SandboxAccountConfig,
 	SandboxConfig,
 } from '@taqueria/node-sdk/types';
-import { importKey, InMemorySigner } from '@taquito/signer';
-import { TezosToolkit } from '@taquito/taquito';
+import { InMemorySigner } from '@taquito/signer';
+import { importKey, TezosToolkit } from '@taquito/taquito';
 
 export type OriginateOpts = ProxyTaskArgs.t & {
 	contract: string;

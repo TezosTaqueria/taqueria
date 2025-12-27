@@ -3,7 +3,7 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "TezosTaqueria",
-	"version": "0.78.0",
+	"version": "0.78.1",
 	"private": true,
 	"engines": {
 		"vscode": "^1.84.2"
@@ -708,7 +708,7 @@
 		"test": "./bin/run-tests.sh"
 	},
 	"devDependencies": {
-		"@taquito/taquito": "23.0.0-beta.0",
+		"@taquito/taquito": "24.0.0-beta.0",
 		"@types/fs-extra": "^11.0.4",
 		"@types/glob": "^8.1.0",
 		"@types/mocha": "^10.0.6",
@@ -727,7 +727,7 @@
 		"@microsoft/signalr": "^8.0.0",
 		"@taqueria/analytics": "workspace:*",
 		"@taqueria/protocol": "workspace:*",
-		"@taquito/rpc": "23.0.0-beta.0",
+		"@taquito/rpc": "24.0.0-beta.0",
 		"cli-table3": "^0.6.3",
 		"comment-json": "^4.2.3",
 		"eventsource": "^2.0.2",

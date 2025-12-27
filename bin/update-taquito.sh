@@ -9,10 +9,14 @@ directories=(
   "taqueria-plugin-contract-types"
   "taqueria-plugin-jest"
   "taqueria-plugin-taquito"
+  "taqueria-plugin-tezbox"
+  "taqueria-plugin-tzcompose"
   "taqueria-protocol"
   "taqueria-sdk"
   "taqueria-vscode-extension"
   "taqueria-vscode-extension-web-ui"
+  "tests"
+  "website"
 )
 
 # Iterate over each directory

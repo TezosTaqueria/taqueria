@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/tests",
-	"version": "0.78.0",
+	"version": "0.78.1",
 	"type": "module",
 	"private": true,
 	"description": "This is Taqueria testing project includes unit, integration and e2e tests",
@@ -15,10 +15,10 @@
 		"test:unit:selected": "../bin/before-all-tests.sh && TEST=true deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",
 		"test:integration": "../bin/before-all-tests.sh && TEST=true pnpm exec jest --config jest.config.integration.ts --no-cache",
 		"test:integration:debug": "../bin/before-all-tests.sh && TEST=true pnpm exec jest --config jest.config.integration.ts --no-cache --detectOpenHandles --detectLeaks",
-		"test:e2e": "../bin/before-all-tests.sh && TEST=true pnpm exec jest --config jest.config.e2e.ts --maxWorkers=1 --passWithNoTests",
-		"test:e2e:smoke": "../bin/before-all-tests.sh && TEST=true pnpm exec jest taqueria-cli-e2e-smoke.spec.ts --config jest.config.e2e.ts --maxWorkers=1",
-		"test:e2e:debug": "../bin/before-all-tests.sh && TEST=true node --inspect-brk node_modules/.bin/jest --config jest.config.e2e.ts --maxWorkers=1 --detectOpenHandles --detectLeaks",
-		"test:e2e:fast": "../bin/before-all-tests.sh && TEST=true pnpm exec jest --config jest.config.e2e.ts --testNamePattern='^((?!slowtest).)*$' --maxWorkers=1"
+		"test:e2e": "../bin/before-all-tests.sh && PATH=$PWD/..:$PATH TEST=true pnpm exec jest --config jest.config.e2e.ts --maxWorkers=1 --passWithNoTests",
+		"test:e2e:smoke": "../bin/before-all-tests.sh && PATH=$PWD/..:$PATH TEST=true pnpm exec jest cli-e2e-smoke-tests.spec.ts --config jest.config.e2e.ts --maxWorkers=1",
+		"test:e2e:debug": "../bin/before-all-tests.sh && PATH=$PWD/..:$PATH TEST=true node --inspect-brk node_modules/.bin/jest --config jest.config.e2e.ts --maxWorkers=1 --detectOpenHandles --detectLeaks",
+		"test:e2e:fast": "../bin/before-all-tests.sh && PATH=$PWD/..:$PATH TEST=true pnpm exec jest --config jest.config.e2e.ts --testNamePattern='^((?!slowtest).)*$' --maxWorkers=1"
 	},
 	"repository": {
 		"type": "git",
@@ -40,8 +40,8 @@
 	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
 	"devDependencies": {
 		"@gmrchk/cli-testing-library": "^0.1.2",
-		"@taquito/signer": "^21.0.0-beta.0",
-		"@taquito/taquito": "^21.0.0-beta.0",
+		"@taquito/signer": "24.0.0-beta.0",
+		"@taquito/taquito": "24.0.0-beta.0",
 		"@types/jest": "^29.5.3",
 		"@types/node": "^17.0.45",
 		"chokidar": "^3.5.3",

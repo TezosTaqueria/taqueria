@@ -50,7 +50,7 @@ importers:
         version: 10.9.2(@types/node@22.7.5)(typescript@5.6.2)
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.3.3
         version: 5.6.2
@@ -69,7 +69,7 @@ importers:
         version: 22.7.5
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -91,7 +91,7 @@ importers:
     devDependencies:
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -113,7 +113,7 @@ importers:
         version: 22.7.5
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -124,14 +124,14 @@ importers:
         specifier: workspace:*
         version: link:../taqueria-sdk
       '@taquito/michel-codec':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@taquito/signer':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@taquito/taquito':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0(encoding@0.1.13)
       bignumber.js:
         specifier: ^9.1.2
         version: 9.1.2
@@ -159,7 +159,7 @@ importers:
         version: 4.2.0
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -175,7 +175,7 @@ importers:
         version: 22.7.5
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -212,7 +212,7 @@ importers:
         version: 22.7.5
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -228,7 +228,7 @@ importers:
         version: 22.7.5
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -253,7 +253,7 @@ importers:
         version: 2.6.11
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -270,14 +270,14 @@ importers:
         specifier: workspace:*
         version: link:../taqueria-plugin-contract-types
       '@taquito/signer':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@taquito/taquito':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0(encoding@0.1.13)
       '@taquito/utils':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@types/jest':
         specifier: ^29.5.11
         version: 29.5.13
@@ -302,7 +302,7 @@ importers:
         version: 22.7.4
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -321,7 +321,7 @@ importers:
     devDependencies:
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -340,7 +340,7 @@ importers:
     devDependencies:
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -362,7 +362,7 @@ importers:
         version: 2.4.9
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.3.3
         version: 5.6.2
@@ -384,7 +384,7 @@ importers:
     devDependencies:
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.3.3
         version: 5.6.2
@@ -403,7 +403,7 @@ importers:
         version: 22.7.5
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.3.3
         version: 5.6.2
@@ -419,7 +419,7 @@ importers:
     devDependencies:
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.3.3
         version: 5.6.2
@@ -430,17 +430,17 @@ importers:
         specifier: workspace:*
         version: link:../taqueria-sdk
       '@taquito/michel-codec':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@taquito/rpc':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0(encoding@0.1.13)
       '@taquito/signer':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@taquito/taquito':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0(encoding@0.1.13)
       fast-glob:
         specifier: ^3.3.2
         version: 3.3.2
@@ -450,7 +450,7 @@ importers:
     devDependencies:
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -464,8 +464,8 @@ importers:
         specifier: workspace:*
         version: link:../taqueria-protocol
       '@taquito/signer':
-        specifier: ^21.0.0-beta.0
-        version: 21.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@types/hjson':
         specifier: ^2.4.6
         version: 2.4.6
@@ -505,7 +505,7 @@ importers:
         version: 22.7.4
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -516,15 +516,15 @@ importers:
         specifier: workspace:*
         version: link:../taqueria-sdk
       '@taquito/signer':
-        specifier: ^21.0.0-beta.0
-        version: 21.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
     devDependencies:
       '@types/node':
         specifier: ^22.7.5
         version: 22.7.5
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -535,14 +535,14 @@ importers:
         specifier: ^1.4.5
         version: 1.5.0
       '@taquito/signer':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@taquito/taquito':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0(encoding@0.1.13)
       '@taquito/utils':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       batching-toposort:
         specifier: ^1.2.0
         version: 1.2.0
@@ -603,7 +603,7 @@ importers:
         version: 3.13.0
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -617,14 +617,14 @@ importers:
         specifier: workspace:*
         version: link:../taqueria-protocol
       '@taquito/signer':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@taquito/taquito':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0(encoding@0.1.13)
       '@taquito/utils':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       bip39:
         specifier: ^3.1.0
         version: 3.1.0
@@ -676,7 +676,7 @@ importers:
         version: 17.0.33
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -707,7 +707,7 @@ importers:
         version: 17.0.33
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
+        version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -724,8 +724,8 @@ importers:
         specifier: workspace:*
         version: link:../taqueria-protocol
       '@taquito/rpc':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0(encoding@0.1.13)
       cli-table3:
         specifier: ^0.6.3
         version: 0.6.5
@@ -752,8 +752,8 @@ importers:
         version: 7.6.3
     devDependencies:
       '@taquito/taquito':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0(encoding@0.1.13)
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
@@ -797,11 +797,11 @@ importers:
   taqueria-vscode-extension-web-ui:
     dependencies:
       '@taquito/michel-codec':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@taquito/michelson-encoder':
-        specifier: 23.0.0-beta.0
-        version: 23.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0(encoding@0.1.13)
       '@vscode/webview-ui-toolkit':
         specifier: ^1.4.0
         version: 1.4.0(react@17.0.2)
@@ -823,16 +823,16 @@ importers:
         version: 1.57.5
       '@vitejs/plugin-react':
         specifier: ^4.3.4
-        version: 4.3.4(vite@6.2.5(@types/node@22.7.5)(yaml@2.7.1))
+        version: 4.3.4(vite@6.2.5(@types/node@22.7.5)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(yaml@2.7.1))
       typescript:
         specifier: ^5.2.2
         version: 5.6.2
       vite:
         specifier: ^6.2.5
-        version: 6.2.5(@types/node@22.7.5)(yaml@2.7.1)
+        version: 6.2.5(@types/node@22.7.5)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(yaml@2.7.1)
       vite-plugin-singlefile:
         specifier: ^1.0.0
-        version: 1.0.0(rollup@4.39.0)(vite@6.2.5(@types/node@22.7.5)(yaml@2.7.1))
+        version: 1.0.0(rollup@4.39.0)(vite@6.2.5(@types/node@22.7.5)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(yaml@2.7.1))
 
   tests:
     dependencies:
@@ -844,11 +844,11 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2
       '@taquito/signer':
-        specifier: ^21.0.0-beta.0
-        version: 21.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0
       '@taquito/taquito':
-        specifier: ^21.0.0-beta.0
-        version: 21.0.0-beta.0(encoding@0.1.13)
+        specifier: 24.0.0-beta.0
+        version: 24.0.0-beta.0(encoding@0.1.13)
       '@types/jest':
         specifier: ^29.5.3
         version: 29.5.13
@@ -875,7 +875,7 @@ importers:
         version: 29.7.0(@types/node@17.0.45)(ts-node@10.9.2(@types/node@17.0.45)(typescript@5.6.2))
       ts-jest:
         specifier: ^29.1.1
-        version: 29.2.5(@babel/core@7.26.10)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.10))(esbuild@0.25.2)(jest@29.7.0(@types/node@17.0.45)(ts-node@10.9.2(@types/node@17.0.45)(typescript@5.6.2)))(typescript@5.6.2)
+        version: 29.2.5(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))(esbuild@0.25.2)(jest@29.7.0(@types/node@17.0.45)(ts-node@10.9.2(@types/node@17.0.45)(typescript@5.6.2)))(typescript@5.6.2)
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@types/node@17.0.45)(typescript@5.6.2)
@@ -1493,6 +1493,9 @@ packages:
     resolution: {integrity: sha512-u3UPsIilWKOM3F9CXtrG8LEJmNxwoCQC/XVj4IKYXvvpx7QIi/Kg1LI5uDmDpKlac62NUtX7eLjRh+jVZcLOzw==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
 
+  '@jridgewell/gen-mapping@0.3.13':
+    resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
+
   '@jridgewell/gen-mapping@0.3.8':
     resolution: {integrity: sha512-imAbBGkb+ebQyxKgzv5Hu2nmROxoDOXHh80evxdoXNOrvAnVx7zimzc1Oo5h9RlfV4vPXaE2iM5pOFbvOCClWA==}
     engines: {node: '>=6.0.0'}
@@ -1505,11 +1508,17 @@ packages:
     resolution: {integrity: sha512-R8gLRTZeyp03ymzP/6Lil/28tGeGEzhx1q2k703KGWRAI1VdvPIXdG70VJc2pAMw3NA6JKL5hhFu1sJX0Mnn/A==}
     engines: {node: '>=6.0.0'}
 
+  '@jridgewell/source-map@0.3.11':
+    resolution: {integrity: sha512-ZMp1V8ZFcPG5dIWnQLr3NSI1MiCU7UETdS/A0G8V/XWHvJv3ZsFqutJn1Y5RPmAPX6F3BiE397OqveU/9NCuIA==}
+
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
+
+  '@jridgewell/trace-mapping@0.3.31':
+    resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
@@ -1538,8 +1547,12 @@ packages:
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
 
-  '@noble/hashes@1.5.0':
-    resolution: {integrity: sha512-1j6kQFb7QRru7eKN3ZDvRcP13rugwdxZqCjbiAVZfIJwgj2A65UmT4TgARXGlXgnRkORLTDTrO19ZErt7+QXgA==}
+  '@noble/curves@1.9.7':
+    resolution: {integrity: sha512-gbKGcRUYIjA3/zCCNaWDciTMFI0dCkvou3TL8Zmy5Nc7sJ47a0jtOeZoTaMxkuqRo9cRhjOdZJXegxYE5FN/xw==}
+    engines: {node: ^14.21.3 || >=16}
+
+  '@noble/hashes@1.8.0':
+    resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
     engines: {node: ^14.21.3 || >=16}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -1735,6 +1748,88 @@ packages:
 
   '@octokit/types@13.10.0':
     resolution: {integrity: sha512-ifLaO34EbbPj0Xgro4G5lP5asESjwHracYJvVaPIyXMuiuXLlhic3S47cBdTb+jfODkTE5YtGCLt3Ay3+J97sA==}
+
+  '@parcel/watcher-android-arm64@2.5.1':
+    resolution: {integrity: sha512-KF8+j9nNbUN8vzOFDpRMsaKBHZ/mcjEjMToVMJOhTozkDonQFFrRcfdLWn6yWKCmJKmdVxSgHiYvTCef4/qcBA==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [android]
+
+  '@parcel/watcher-darwin-arm64@2.5.1':
+    resolution: {integrity: sha512-eAzPv5osDmZyBhou8PoF4i6RQXAfeKL9tjb3QzYuccXFMQU0ruIc/POh30ePnaOyD1UXdlKguHBmsTs53tVoPw==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@parcel/watcher-darwin-x64@2.5.1':
+    resolution: {integrity: sha512-1ZXDthrnNmwv10A0/3AJNZ9JGlzrF82i3gNQcWOzd7nJ8aj+ILyW1MTxVk35Db0u91oD5Nlk9MBiujMlwmeXZg==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@parcel/watcher-freebsd-x64@2.5.1':
+    resolution: {integrity: sha512-SI4eljM7Flp9yPuKi8W0ird8TI/JK6CSxju3NojVI6BjHsTyK7zxA9urjVjEKJ5MBYC+bLmMcbAWlZ+rFkLpJQ==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@parcel/watcher-linux-arm-glibc@2.5.1':
+    resolution: {integrity: sha512-RCdZlEyTs8geyBkkcnPWvtXLY44BCeZKmGYRtSgtwwnHR4dxfHRG3gR99XdMEdQ7KeiDdasJwwvNSF5jKtDwdA==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm]
+    os: [linux]
+
+  '@parcel/watcher-linux-arm-musl@2.5.1':
+    resolution: {integrity: sha512-6E+m/Mm1t1yhB8X412stiKFG3XykmgdIOqhjWj+VL8oHkKABfu/gjFj8DvLrYVHSBNC+/u5PeNrujiSQ1zwd1Q==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm]
+    os: [linux]
+
+  '@parcel/watcher-linux-arm64-glibc@2.5.1':
+    resolution: {integrity: sha512-LrGp+f02yU3BN9A+DGuY3v3bmnFUggAITBGriZHUREfNEzZh/GO06FF5u2kx8x+GBEUYfyTGamol4j3m9ANe8w==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@parcel/watcher-linux-arm64-musl@2.5.1':
+    resolution: {integrity: sha512-cFOjABi92pMYRXS7AcQv9/M1YuKRw8SZniCDw0ssQb/noPkRzA+HBDkwmyOJYp5wXcsTrhxO0zq1U11cK9jsFg==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@parcel/watcher-linux-x64-glibc@2.5.1':
+    resolution: {integrity: sha512-GcESn8NZySmfwlTsIur+49yDqSny2IhPeZfXunQi48DMugKeZ7uy1FX83pO0X22sHntJ4Ub+9k34XQCX+oHt2A==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [linux]
+
+  '@parcel/watcher-linux-x64-musl@2.5.1':
+    resolution: {integrity: sha512-n0E2EQbatQ3bXhcH2D1XIAANAcTZkQICBPVaxMeaCVBtOpBZpWJuf7LwyWPSBDITb7In8mqQgJ7gH8CILCURXg==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [linux]
+
+  '@parcel/watcher-win32-arm64@2.5.1':
+    resolution: {integrity: sha512-RFzklRvmc3PkjKjry3hLF9wD7ppR4AKcWNzH7kXR7GUe0Igb3Nz8fyPwtZCSquGrhU5HhUNDr/mKBqj7tqA2Vw==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@parcel/watcher-win32-ia32@2.5.1':
+    resolution: {integrity: sha512-c2KkcVN+NJmuA7CGlaGD1qJh1cLfDnQsHjE89E60vUEMlqduHGCdCLJCID5geFVM0dOtA3ZiIO8BoEQmzQVfpQ==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [ia32]
+    os: [win32]
+
+  '@parcel/watcher-win32-x64@2.5.1':
+    resolution: {integrity: sha512-9lHBdJITeNR++EvSQVUcaZoWupyHfXe1jZvGZ06O/5MflPcuPLtEphScIBL+AiCWBO46tDSHzWyD0uDmmZqsgA==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [win32]
+
+  '@parcel/watcher@2.5.1':
+    resolution: {integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==}
+    engines: {node: '>= 10.0.0'}
 
   '@peculiar/asn1-schema@2.3.13':
     resolution: {integrity: sha512-3Xq3a01WkHRZL8X04Zsfg//mGaA21xlL4tlVn4v2xGT0JStiztATRkMwa5b+f/HXmY2smsiLXYK46Gwgzvfg3g==}
@@ -1934,93 +2029,41 @@ packages:
   '@stablelib/xsalsa20@1.0.2':
     resolution: {integrity: sha512-7XdBGbcNgBShmuhDXv1G1WPVCkjZdkb1oPMzSidO7Fve0MHntH6TjFkj5bfLI+aRE+61weO076vYpP/jmaAYog==}
 
-  '@taquito/core@21.0.0-beta.0':
-    resolution: {integrity: sha512-O9KHCztAkrWMYT4hx5u0f7JAKjQcRBtvi8xn/dkf6cjBlYGSGA02zRxTsX9JPR4o15585qLcUWLQSQlNHvYGHw==}
+  '@taquito/core@24.0.0-beta.0':
+    resolution: {integrity: sha512-GfvoD/bit8rpCKFRPRY9r1ugqdpJHTe9HpCdjs7BKfi+pFVYE5TVAsQTQXAJ2lc8j55CX+/d8n93PZiWE+hQmA==}
     engines: {node: '>=20'}
 
-  '@taquito/core@21.0.4':
-    resolution: {integrity: sha512-9oksCfgaPRrdU+Dt+CaR5fcw9ERjpBcJGppmxsRFxrPvbRK/mspOxdJjW9uLT4joxG7ML9ImOR0rsa8z+Px93w==}
-    engines: {node: '>=18'}
-
-  '@taquito/core@23.0.0-beta.0':
-    resolution: {integrity: sha512-qrPcM1JXnW6R3yrnPPb60soClSSAJsjdhK/ckRvr1egklGwPv8MaixEGE/qha57M8tSm8gAzAzru1ydBVC8leA==}
-    engines: {node: '>=18'}
-
-  '@taquito/http-utils@21.0.0-beta.0':
-    resolution: {integrity: sha512-oopiQYSsurRwW5QqTbZ1m7+imS61jXKpiZlBUm9TIO5B3rwIj9y5zgv/M47ar4vw2q2jPKk/JGOS+V5iqO5iiA==}
+  '@taquito/http-utils@24.0.0-beta.0':
+    resolution: {integrity: sha512-S0paYG2f43rJLUtgaijarygKGuk9rm/+F30T5WOqLtde6CMNeJWTp9IAtjoXPqb1IisFwjb15ZKazfX7wuMCXg==}
     engines: {node: '>=20'}
 
-  '@taquito/http-utils@21.0.4':
-    resolution: {integrity: sha512-6BqxkhZ50IoiE21KLUqc4Kt2PyruYoCGiiQbhmffNU6/f7+buB96ztZmES+qopA6MUZLGk//MqeF9t7d9zuyYg==}
-    engines: {node: '>=18'}
-
-  '@taquito/http-utils@23.0.0-beta.0':
-    resolution: {integrity: sha512-GK0kDLrp0kAUCHl5Ib8ImclVAC5bb8ipA9hJvBu5XuZyJqeePQeO7Q4/lvLhQns8Mr3GxdR7391gSFma7GVGXA==}
-    engines: {node: '>=18'}
-
-  '@taquito/local-forging@21.0.0-beta.0':
-    resolution: {integrity: sha512-NiYe0ZghGK7g8sSZ4fr/9bgt0E5CxBD2dEW678Eweax1Ul43Stk1+hJGEsJ6hriVA1tt0UltTI5e1mmZKGaaRA==}
+  '@taquito/local-forging@24.0.0-beta.0':
+    resolution: {integrity: sha512-p0gCO8R826QTbf/1++5sJQNcgVaLwNe3VjdhHnX98FizjrgNmCLKqjQtp19uj92fDHI8OZqOrHidy+QQ5DG0QQ==}
     engines: {node: '>=20'}
 
-  '@taquito/local-forging@21.0.4':
-    resolution: {integrity: sha512-zHSYyNqcpCOe3sNoWFC4MWlF26nnjoLf3cMSIK2K2v4yrPvBOX3Q+3CsMEezQ7aI9dOFyrk1zYMZtFlSsWw35A==}
-    engines: {node: '>=18'}
-
-  '@taquito/local-forging@23.0.0-beta.0':
-    resolution: {integrity: sha512-3trsFn/c+Fmz37E/hcfBC8Pk98jCqWpQQRFCGHbQBSUVeeRWv8t0L9tROFUcHdhfKAcWpnmco53v55FGDew+Rg==}
-    engines: {node: '>=18'}
-
-  '@taquito/michel-codec@21.0.4':
-    resolution: {integrity: sha512-Aa5mX9QpWC5eqz6ggUzAtKdnbhdiDqRa3+VqdbFjKmdrGH3y+nQtTXiJT96ZvgO8z7o7hQEzRrfHX6zRaWT53A==}
-    engines: {node: '>=18'}
-
-  '@taquito/michel-codec@23.0.0-beta.0':
-    resolution: {integrity: sha512-30qFyZFydIJ5pfKUO+vjjZ291ePgveuY+F3cYcBLtzJ6LH9j0Z84RyEGB8qPVdGP/uJMbDpFpzczH0MDkP4WxA==}
-    engines: {node: '>=18'}
-
-  '@taquito/michelson-encoder@21.0.4':
-    resolution: {integrity: sha512-iafzymrq1j+K8X4qmHN2dR0Pez0FzZk6DHvNYihilFkn7MXMh5K9Ag0BJbvUrvuS7ZwkKuMSceif0obNcUU7UA==}
-    engines: {node: '>=18'}
-
-  '@taquito/michelson-encoder@23.0.0-beta.0':
-    resolution: {integrity: sha512-ZHlDVVx201UU14f/k8Flycf+h0ik0zG25kTzL6G+0lry7kCHJybh/fEDeD33lHnAMTwkqATPa2fIV3A7VgROCA==}
-    engines: {node: '>=18'}
-
-  '@taquito/rpc@21.0.4':
-    resolution: {integrity: sha512-Fv4Qi4/2n9oN4PPpbG54Gu7i2ZQL2YqbscrPCgG74cm/vUi0tzjZ1zIL9xxbngzS7NQ/r315OG5WulxuYy/GOA==}
-    engines: {node: '>=18'}
-
-  '@taquito/rpc@23.0.0-beta.0':
-    resolution: {integrity: sha512-tSsXcehG4j+6qYUV8DOpoqqK8UmceVrg1VMhUBQlqlyxWsikdMq2XYKyLZY1zYVw54NOa6hkEiLxzBxeFYy46A==}
-    engines: {node: '>=18'}
-
-  '@taquito/signer@21.0.0-beta.0':
-    resolution: {integrity: sha512-5sijDBlgXf9H5mPBc8SSRUeKxRfY2eTrIaeITpVGSKkCljBCq/BZawaV8giXtrdGjMkxyvdpeSWOx2w5kCeZoQ==}
+  '@taquito/michel-codec@24.0.0-beta.0':
+    resolution: {integrity: sha512-SYZdV9VJA4lISJzh8SxM9xGi0hcqqhjim90Oe2wh/8CTSQAY/xG3Sx6dftBw+FYgUIQCrgUEbmiVLX2zZBCHZw==}
     engines: {node: '>=20'}
 
-  '@taquito/signer@23.0.0-beta.0':
-    resolution: {integrity: sha512-ouA0bWR7Ki7mwK84bNpiCnpI+mtXYmS7HosmnpMHqSj8qzBxlPN1FwhjLxLK2Zcg127ffa5cdr4riU8P8IDHUA==}
-    engines: {node: '>=18'}
-
-  '@taquito/taquito@21.0.0-beta.0':
-    resolution: {integrity: sha512-0R5K4c7aNKZ5GpoygTFWPooqEQ+rN8svTgEOIF5WOF2K1wSXB8pNNpjWv2aTy51lt7XQzJeO4zDhCMhYXU3dUg==}
+  '@taquito/michelson-encoder@24.0.0-beta.0':
+    resolution: {integrity: sha512-+ERHi1+cdQTWXtuOFiHskrtAlunWLw62PKanU7sf8rKXkeTqvVDGeIoTrQ0dzWpBhmgo+2+3wLhVWdOUdHMdCw==}
     engines: {node: '>=20'}
 
-  '@taquito/taquito@21.0.4':
-    resolution: {integrity: sha512-F3FJruE5VqKKeVk6tUFKIEaWGBjYY8XeANcr98VS2T/75TB2838+pjDL5FQpxCOyJ4hfyAHOCd1pWUx8PMtCbg==}
-    engines: {node: '>=18'}
+  '@taquito/rpc@24.0.0-beta.0':
+    resolution: {integrity: sha512-hVoV3Jtygn/v5Eqv/3GomPWrCP3B3UAr6h1WL9st+R2Fv6YP/oqPSxAyWMOx1PG7zmbDEsRocxxi+iJUrPlv8w==}
+    engines: {node: '>=20'}
 
-  '@taquito/taquito@23.0.0-beta.0':
-    resolution: {integrity: sha512-c2GlCww3bAuazVhA8Da8cg0IwXfMaGdATP60WmB8ZetIIE3RE48ljLkYnGodAptVjPtATIvg5MOUkTpZutjLnw==}
-    engines: {node: '>=18'}
+  '@taquito/signer@24.0.0-beta.0':
+    resolution: {integrity: sha512-5NtMvY/bw7pUvNs4YYw48MqNDRhwDuWoWDNNxJXWDeEoJh7kaROTzdrSLFILLasTZRvwduuCII48c00a1AFdkg==}
+    engines: {node: '>=20'}
 
-  '@taquito/utils@21.0.4':
-    resolution: {integrity: sha512-GwQ12LUZwtf2uluMkIZP/EQfQbfEMe94FXg5lpd3Cmx9BZy5ymDNxsxTsGpt+M8god9V1FhHqevEss+gwETqdQ==}
-    engines: {node: '>=18'}
+  '@taquito/taquito@24.0.0-beta.0':
+    resolution: {integrity: sha512-qTn94746bT/pVkNIsKBbG4HcG7JpeTyYO6u0Jo7o1VJlc/NMlExgtfLKxVqjrWAHqYd3/WzQyeLbpM9DNVbJHQ==}
+    engines: {node: '>=20'}
 
-  '@taquito/utils@23.0.0-beta.0':
-    resolution: {integrity: sha512-j/48AY2ty4/9XTbhnf0zN5R9PZoSbsxtcZ8W8oq5njO/k1ZMvyhDoGFAnKrs7tkIwqBsdbwmFoOoJCPNy7zJkw==}
-    engines: {node: '>=18'}
+  '@taquito/utils@24.0.0-beta.0':
+    resolution: {integrity: sha512-/YkgODfOum5FEgO90lodn8E2ubxM/VwGsNzfu4bQlX/6SX3+HIK7bCORN4u+/xOCuQ1HB9kHD3TPH7DtMRU2bQ==}
+    engines: {node: '>=20'}
 
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
@@ -2283,6 +2326,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  acorn@8.15.0:
+    resolution: {integrity: sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
   add-stream@1.0.0:
     resolution: {integrity: sha512-qQLMr+8o0WC4FZGQTcJiKBVC59JylcPSrTtk6usvmIDFUOCKegapy1VHQwRbFMOFyb/inzUVqHs+eMYKDM1YeQ==}
 
@@ -2402,6 +2450,10 @@ packages:
   at-least-node@1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
     engines: {node: '>= 4.0.0'}
+
+  available-typed-arrays@1.0.7:
+    resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
+    engines: {node: '>= 0.4'}
 
   axios@1.8.4:
     resolution: {integrity: sha512-eBSYY4Y68NNlHbHBMdeDmKNtDgXWhQsJcGqzO3iLUM0GraQFSS9cVgPX5I9b3lbdFKyYoAEGAZF1DwhTaljNAw==}
@@ -2549,6 +2601,14 @@ packages:
 
   call-bind@1.0.7:
     resolution: {integrity: sha512-GHTSNSYICQ7scH7sZ+M2rFopRoLh8t2bLSW6BbgrtLsahOIB5iyAVJf9GjWK3cYTDaMj4XdBpM1cA6pIS0Kv2w==}
+    engines: {node: '>= 0.4'}
+
+  call-bind@1.0.8:
+    resolution: {integrity: sha512-oKlSFMcMwpUg2ednkhQ454wfWiU/ul3CkJe/PEHcTKuiX6RpbehUiFMXu13HalGZxfUwCQzZG747YXBn1im9ww==}
+    engines: {node: '>= 0.4'}
+
+  call-bound@1.0.4:
+    resolution: {integrity: sha512-+ys997U96po4Kx/ABpBCqhA9EuxJaQWDQg7295H4hBphv3IZg0boBKuwYpt4YXp6MZ5AmZQnU/tyMTlRpaSejg==}
     engines: {node: '>= 0.4'}
 
   callsites@3.1.0:
@@ -2740,6 +2800,9 @@ packages:
     resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
     engines: {node: '>=18'}
 
+  commander@2.20.3:
+    resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
+
   commander@4.1.1:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}
     engines: {node: '>= 6'}
@@ -2928,6 +2991,11 @@ packages:
   detect-indent@5.0.0:
     resolution: {integrity: sha512-rlpvsxUtM0PQvy9iZe640/IWwWYyBsTApREbA1pHOpmOUIl9MkP/U4z7vTtg4Oaojvqhxt7sdufnT0EzGaR31g==}
     engines: {node: '>=4'}
+
+  detect-libc@1.0.3:
+    resolution: {integrity: sha512-pGjwhsmsp4kL2RTz08wcOlGN83otlqHeD/Z5T8GXZB+/YcpQ/dgo+lbU8ZsGxV0HIvqqxo9l7mqYwyYMD9bKDg==}
+    engines: {node: '>=0.10'}
+    hasBin: true
 
   detect-newline@3.1.0:
     resolution: {integrity: sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==}
@@ -3175,6 +3243,9 @@ packages:
   fast-json-stable-stringify@2.1.0:
     resolution: {integrity: sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==}
 
+  fast-text-encoding@1.0.6:
+    resolution: {integrity: sha512-VhXlQgj9ioXCqGstD37E/HBeqEGV/qOD/kmbVG8h5xKBYvM1L3lR1Zn4555cQ8GkYbJa8aJSipLPndE1k6zK2w==}
+
   fastq@1.17.1:
     resolution: {integrity: sha512-sRVD3lWVIXWg6By68ZN7vho9a1pQcN/WBFaAAsDDFzlJjvoGx0P8z7V1t72grFJfJhu3YPZBuu25f7Kaw2jN1w==}
 
@@ -3244,6 +3315,10 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
+
+  for-each@0.3.5:
+    resolution: {integrity: sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg==}
+    engines: {node: '>= 0.4'}
 
   foreground-child@3.3.0:
     resolution: {integrity: sha512-Ld2g8rrAyMYFXBhEqMz8ZAHBi4J4uS1i/CxGMDnjyFWddMXLVcDp051DZfu+t7+ab7Wv6SMqpWmyFIj5UbfFvg==}
@@ -3397,9 +3472,6 @@ packages:
     resolution: {integrity: sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==}
     engines: {node: '>=10'}
 
-  gopd@1.0.1:
-    resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
-
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
@@ -3453,6 +3525,10 @@ packages:
   hash-base@3.1.0:
     resolution: {integrity: sha512-1nmYp/rhMDiE7AYkDw+lLwlAzz0AntGIe51F3RfFfEqyQ3feY2eI/NcwC6umIQVOASPMsWJLJScWKSSvzL9IVA==}
     engines: {node: '>=4'}
+
+  hash-base@3.1.2:
+    resolution: {integrity: sha512-Bb33KbowVTIj5s7Ked1OsqHUeCpz//tPwR+E2zJgJKo9Z5XolZ9b6bdUgjmYlwnWhoOQKoTd1TYToZGn5mAYOg==}
+    engines: {node: '>= 0.8'}
 
   hash.js@1.1.7:
     resolution: {integrity: sha512-taOaskGt4z4SOANNseOviYDvjEJinIkRgmp7LbKP2YTTmVxWBl87s/uzK9r+44BclBSp2X7K1hqeNfz9JbBeXA==}
@@ -3550,6 +3626,9 @@ packages:
   immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
 
+  immutable@5.1.4:
+    resolution: {integrity: sha512-p6u1bG3YSnINT5RQmx/yRZBpenIl30kVxkTLDyHLIMk0gict704Q9n+thfDI7lTRm9vXdDYutVzXhzcThxTnXA==}
+
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
     engines: {node: '>=6'}
@@ -3600,6 +3679,10 @@ packages:
   is-binary-path@2.1.0:
     resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
     engines: {node: '>=8'}
+
+  is-callable@1.2.7:
+    resolution: {integrity: sha512-1BC0BVFhS/p0qtw6enp8e+8OD0UrK0oFLztSjNzhcKA3WDuJxxAPXzPuPtKkjEY9UUoEWlX/8fgKeu2S8i9JTA==}
+    engines: {node: '>= 0.4'}
 
   is-ci@3.0.1:
     resolution: {integrity: sha512-ZYvCgrefwqoQ6yTyYUbQu64HsITZ3NfKX1lzaEYdkTDcfKzzCI/wthRRYKkdjHKFVgNiXKAKm65Zo1pk2as/QQ==}
@@ -3695,6 +3778,10 @@ packages:
   is-text-path@1.0.1:
     resolution: {integrity: sha512-xFuJpne9oFz5qDaodwmmG08e3CawH/2ZV8Qqza1Ko7Sk8POWbkRdwIoAWVhqvq0XeUzANEhKo2n0IXUGBm7A/w==}
     engines: {node: '>=0.10.0'}
+
+  is-typed-array@1.1.15:
+    resolution: {integrity: sha512-p3EcsicXjit7SaskXHs1hA91QxgTw46Fv6EFKKGS5DRFLD8yKnohjF3hxoju94b/OcMZoQukzpPpBE9uLVKzgQ==}
+    engines: {node: '>= 0.4'}
 
   is-unicode-supported@0.1.0:
     resolution: {integrity: sha512-knxG2q4UC3u8stRGyAVJCOdxFmv5DZiRcdlIaAQXAbSfJya+OhopNotLQrstBhququ4ZpuKbDc/8S6mgXgPFPw==}
@@ -3890,6 +3977,10 @@ packages:
     peerDependenciesMeta:
       node-notifier:
         optional: true
+
+  jiti@1.21.7:
+    resolution: {integrity: sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==}
+    hasBin: true
 
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
@@ -4339,6 +4430,9 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
+  node-addon-api@7.1.1:
+    resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
+
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
@@ -4657,9 +4751,9 @@ packages:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
 
-  pbkdf2@3.1.2:
-    resolution: {integrity: sha512-iuh7L6jA7JEGu2WxDwtQP1ddOpaJNC4KlDEFfdQajSGgGPNi4OyDc2R7QnbY2bR9QjBVGwgvTdNJZoE7RaxUMA==}
-    engines: {node: '>=0.12'}
+  pbkdf2@3.1.5:
+    resolution: {integrity: sha512-Q3CG/cYvCO1ye4QKkuH7EXxs3VC/rI1/trd+qX2+PolbaKG0H+bgcZzrTt96mMyRtejk+JMCiLUn3y29W8qmFQ==}
+    engines: {node: '>= 0.10'}
 
   pend@1.2.0:
     resolution: {integrity: sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg==}
@@ -4712,6 +4806,10 @@ packages:
   portfinder@1.0.32:
     resolution: {integrity: sha512-on2ZJVVDXRADWE6jnQaX0ioEylzgBpQk8r55NE4wjXW1ZxO+BgDlY6DXwj20i0V8eB4SenDQ00WEaxfiIQPcxg==}
     engines: {node: '>= 0.12.0'}
+
+  possible-typed-array-names@1.1.0:
+    resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
+    engines: {node: '>= 0.4'}
 
   postcss-load-config@6.0.1:
     resolution: {integrity: sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g==}
@@ -4982,6 +5080,10 @@ packages:
   ripemd160@2.0.2:
     resolution: {integrity: sha512-ii4iagi25WusVoiC4B4lq7pbXfAp3D9v5CwfkY33vffw2+pkDjY1D8GaN7spsxvCSx8dkPqOZCEZyfxcmJG2IA==}
 
+  ripemd160@2.0.3:
+    resolution: {integrity: sha512-5Di9UC0+8h1L6ZD2d7awM7E/T4uA1fJRlx6zk/NvdCCVEoAnFqvHmCuNeIKoCeIixBX/q8uM+6ycDvF8woqosA==}
+    engines: {node: '>= 0.8'}
+
   rollup@4.39.0:
     resolution: {integrity: sha512-thI8kNc02yNvnmJp8dr3fNWJ9tCONDhp6TV35X6HkKGGs9E6q7YWCHbe5vKiTa7TAiNcFEmXKj3X/pG2b3ci0g==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -5014,6 +5116,11 @@ packages:
 
   sanctuary-type-identifiers@3.0.0:
     resolution: {integrity: sha512-YFXYcG0Ura1dSPd/1xLYtE2XAWUEsBHhMTZvYBOvwT8MeFQwdUOCMm2DC+r94z6H93FVq0qxDac8/D7QpJj6Mg==}
+
+  sass@1.97.1:
+    resolution: {integrity: sha512-uf6HoO8fy6ClsrShvMgaKUn14f2EHQLQRtpsZZLeU/Mv0Q1K5P0+x2uvH6Cub39TVVbWNSrraUhDAoFph6vh0A==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
 
   sax@1.4.1:
     resolution: {integrity: sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==}
@@ -5054,6 +5161,11 @@ packages:
 
   sha.js@2.4.11:
     resolution: {integrity: sha512-QMEp5B7cftE7APOjk5Y6xgrbWu+WkLVQwk8JNjZ8nKRciZaByEW6MubieAiToS7+dwvrjGhH8jRXz3MVd0AYqQ==}
+    hasBin: true
+
+  sha.js@2.4.12:
+    resolution: {integrity: sha512-8LzC5+bvI45BjpfXU8V5fdU2mfeKiQe1D1gIMn7XUlF3OTUrpdJpPPH4EMAnF0DsHHdSZqCdSss5qCmJKuiO3w==}
+    engines: {node: '>= 0.10'}
     hasBin: true
 
   shallow-clone@3.0.1:
@@ -5130,6 +5242,9 @@ packages:
 
   source-map-support@0.5.13:
     resolution: {integrity: sha512-SHSKFHadjVA5oR4PPqhtAVdcBWwRYVd6g6cAXnIbRiIwc2EhPrTuKUBdSLvlEKyIP3GCf89fltvcZiP9MMFA1w==}
+
+  source-map-support@0.5.21:
+    resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
 
   source-map@0.5.6:
     resolution: {integrity: sha512-MjZkVp0NHr5+TPihLcadqnlVoGIoWo4IBHptutGh9wI3ttUYvCG26HkSuDi+K6lsZ25syXJXcctwgyVCt//xqA==}
@@ -5305,6 +5420,11 @@ packages:
     resolution: {integrity: sha512-xZFXEGbG7SNC3itwBzI3RYjq/cEhBkx2hJuKGIUOcEULmkQExXiHat2z/qkISYsuR+IKumhEfKKbV5qXmhICFQ==}
     engines: {node: '>=4'}
 
+  terser@5.44.1:
+    resolution: {integrity: sha512-t/R3R/n0MSwnnazuPpPNVO60LX0SKL45pyl9YlvxIdkH0Of7D5qM2EVe+yASRIlY5pZ73nclYJfNANGWPwFDZw==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   test-exclude@6.0.0:
     resolution: {integrity: sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==}
     engines: {node: '>=8'}
@@ -5350,6 +5470,10 @@ packages:
   tmpl@1.0.5:
     resolution: {integrity: sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==}
 
+  to-buffer@1.2.2:
+    resolution: {integrity: sha512-db0E3UJjcFhpDhAF4tLo03oli3pwl3dbnzXOUIlRKrp+ldk/VUxzpWYZENsw2SZiuBjHAk7DfB0VU7NKdpb6sw==}
+    engines: {node: '>= 0.4'}
+
   to-fast-properties@2.0.0:
     resolution: {integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==}
     engines: {node: '>=4'}
@@ -5361,10 +5485,6 @@ packages:
   tough-cookie@4.1.4:
     resolution: {integrity: sha512-Loo5UUvLD9ScZ6jh8beX1T6sO1w2/MpCRpEP7V280GKMVUQ0Jzar2U3UJPsrdbziLEMMhu3Ujnq//rhiFuIeag==}
     engines: {node: '>=6'}
-
-  tr46@5.0.0:
-    resolution: {integrity: sha512-tk2G5R2KRwBd+ZN0zaEXpmzdKyOYksXwywulIX95MBODjSzMIuQnQ3m8JxgbhnL1LeVo7lqQKsYa1O3Htl7K5g==}
-    engines: {node: '>=18'}
 
   tr46@5.1.0:
     resolution: {integrity: sha512-IUWnUK7ADYR5Sl1fZlO1INDUhVhatWl7BtJWsIhwJ0UAK7ilzzIa8uIqOO/aYVWHZPJkKbEL+362wrzoeRF7bw==}
@@ -5502,6 +5622,10 @@ packages:
   type-fest@0.8.1:
     resolution: {integrity: sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==}
     engines: {node: '>=8'}
+
+  typed-array-buffer@1.0.3:
+    resolution: {integrity: sha512-nAYYwfY3qnzX30IkA6AQZjVbtK6duGontcQm1WSG1MD94YLqK0515GNApXkoxKOWMusVssAHWLh9SeaoefYFGw==}
+    engines: {node: '>= 0.4'}
 
   typed-rest-client@1.8.11:
     resolution: {integrity: sha512-5UvfMpd1oelmUPRbbaVnq+rHP7ng2cE4qoQkQeAqxRL6PklkxsM0g32/HL0yfvruK6ojQ5x8EE+HF4YV6DtuCA==}
@@ -5670,16 +5794,16 @@ packages:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
     engines: {node: '>=18'}
 
-  whatwg-url@14.0.0:
-    resolution: {integrity: sha512-1lfMEm2IEr7RIV+f4lUNPOqfFL+pO+Xw3fJSqmjX9AbXcXcYOkCe1P6+9VBZB6n94af16NfZf+sSk0JCBZC9aw==}
-    engines: {node: '>=18'}
-
   whatwg-url@14.2.0:
     resolution: {integrity: sha512-De72GdQZzNTUBBChsXueQUnPKDkg/5A5zp7pFDuQAj5UFoENpiACU0wlCvzpAGnTkj++ihpKwKyYewn/XNUbKw==}
     engines: {node: '>=18'}
 
   which-module@2.0.1:
     resolution: {integrity: sha512-iBdZ57RDvnOR9AGBhML2vFZf7h8vmBjhoaZqODJBFWHVtKkDmKuHai3cx5PgVMrX5YDNp27AofYbAwctSS+vhQ==}
+
+  which-typed-array@1.1.19:
+    resolution: {integrity: sha512-rEvr90Bck4WZt9HHFC4DJMsjvu7x+r6bImz0/BrbWb7A2djJ8hnZMrWnHo9F8ssv0OMErasDhftrfROTyqSDrw==}
+    engines: {node: '>= 0.4'}
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -6096,20 +6220,44 @@ snapshots:
       '@babel/helper-plugin-utils': 7.24.8
       '@babel/plugin-syntax-export-namespace-from': 7.8.3(@babel/core@7.25.2)
 
+  '@babel/plugin-syntax-async-generators@7.8.4(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
+
   '@babel/plugin-syntax-async-generators@7.8.4(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
+
+  '@babel/plugin-syntax-bigint@7.8.3(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
 
   '@babel/plugin-syntax-bigint@7.8.3(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
 
+  '@babel/plugin-syntax-class-properties@7.12.13(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
+
   '@babel/plugin-syntax-class-properties@7.12.13(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
+
+  '@babel/plugin-syntax-class-static-block@7.14.5(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
 
   '@babel/plugin-syntax-class-static-block@7.14.5(@babel/core@7.26.10)':
     dependencies:
@@ -6121,15 +6269,33 @@ snapshots:
       '@babel/core': 7.25.2
       '@babel/helper-plugin-utils': 7.24.8
 
+  '@babel/plugin-syntax-import-attributes@7.25.6(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
+
   '@babel/plugin-syntax-import-attributes@7.25.6(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
 
+  '@babel/plugin-syntax-import-meta@7.10.4(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
+
   '@babel/plugin-syntax-import-meta@7.10.4(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
+
+  '@babel/plugin-syntax-json-strings@7.8.3(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
 
   '@babel/plugin-syntax-json-strings@7.8.3(@babel/core@7.26.10)':
     dependencies:
@@ -6141,40 +6307,88 @@ snapshots:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
 
+  '@babel/plugin-syntax-logical-assignment-operators@7.10.4(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
+
   '@babel/plugin-syntax-logical-assignment-operators@7.10.4(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
+
+  '@babel/plugin-syntax-nullish-coalescing-operator@7.8.3(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
 
   '@babel/plugin-syntax-nullish-coalescing-operator@7.8.3(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
 
+  '@babel/plugin-syntax-numeric-separator@7.10.4(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
+
   '@babel/plugin-syntax-numeric-separator@7.10.4(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
+
+  '@babel/plugin-syntax-object-rest-spread@7.8.3(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
 
   '@babel/plugin-syntax-object-rest-spread@7.8.3(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
 
+  '@babel/plugin-syntax-optional-catch-binding@7.8.3(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
+
   '@babel/plugin-syntax-optional-catch-binding@7.8.3(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
+
+  '@babel/plugin-syntax-optional-chaining@7.8.3(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
 
   '@babel/plugin-syntax-optional-chaining@7.8.3(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
 
+  '@babel/plugin-syntax-private-property-in-object@7.14.5(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
+
   '@babel/plugin-syntax-private-property-in-object@7.14.5(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
+
+  '@babel/plugin-syntax-top-level-await@7.14.5(@babel/core@7.25.2)':
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/helper-plugin-utils': 7.26.5
+    optional: true
 
   '@babel/plugin-syntax-top-level-await@7.14.5(@babel/core@7.26.10)':
     dependencies:
@@ -6592,9 +6806,15 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 20.16.10
+      '@types/node': 22.7.5
       '@types/yargs': 17.0.33
       chalk: 4.1.2
+
+  '@jridgewell/gen-mapping@0.3.13':
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/trace-mapping': 0.3.31
+    optional: true
 
   '@jridgewell/gen-mapping@0.3.8':
     dependencies:
@@ -6606,12 +6826,24 @@ snapshots:
 
   '@jridgewell/set-array@1.2.1': {}
 
+  '@jridgewell/source-map@0.3.11':
+    dependencies:
+      '@jridgewell/gen-mapping': 0.3.13
+      '@jridgewell/trace-mapping': 0.3.31
+    optional: true
+
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
   '@jridgewell/trace-mapping@0.3.25':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  '@jridgewell/trace-mapping@0.3.31':
+    dependencies:
+      '@jridgewell/resolve-uri': 3.1.2
+      '@jridgewell/sourcemap-codec': 1.5.0
+    optional: true
 
   '@jridgewell/trace-mapping@0.3.9':
     dependencies:
@@ -6737,7 +6969,11 @@ snapshots:
       '@emnapi/runtime': 1.4.0
       '@tybys/wasm-util': 0.9.0
 
-  '@noble/hashes@1.5.0': {}
+  '@noble/curves@1.9.7':
+    dependencies:
+      '@noble/hashes': 1.8.0
+
+  '@noble/hashes@1.8.0': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -7009,6 +7245,67 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 24.2.0
 
+  '@parcel/watcher-android-arm64@2.5.1':
+    optional: true
+
+  '@parcel/watcher-darwin-arm64@2.5.1':
+    optional: true
+
+  '@parcel/watcher-darwin-x64@2.5.1':
+    optional: true
+
+  '@parcel/watcher-freebsd-x64@2.5.1':
+    optional: true
+
+  '@parcel/watcher-linux-arm-glibc@2.5.1':
+    optional: true
+
+  '@parcel/watcher-linux-arm-musl@2.5.1':
+    optional: true
+
+  '@parcel/watcher-linux-arm64-glibc@2.5.1':
+    optional: true
+
+  '@parcel/watcher-linux-arm64-musl@2.5.1':
+    optional: true
+
+  '@parcel/watcher-linux-x64-glibc@2.5.1':
+    optional: true
+
+  '@parcel/watcher-linux-x64-musl@2.5.1':
+    optional: true
+
+  '@parcel/watcher-win32-arm64@2.5.1':
+    optional: true
+
+  '@parcel/watcher-win32-ia32@2.5.1':
+    optional: true
+
+  '@parcel/watcher-win32-x64@2.5.1':
+    optional: true
+
+  '@parcel/watcher@2.5.1':
+    dependencies:
+      detect-libc: 1.0.3
+      is-glob: 4.0.3
+      micromatch: 4.0.8
+      node-addon-api: 7.1.1
+    optionalDependencies:
+      '@parcel/watcher-android-arm64': 2.5.1
+      '@parcel/watcher-darwin-arm64': 2.5.1
+      '@parcel/watcher-darwin-x64': 2.5.1
+      '@parcel/watcher-freebsd-x64': 2.5.1
+      '@parcel/watcher-linux-arm-glibc': 2.5.1
+      '@parcel/watcher-linux-arm-musl': 2.5.1
+      '@parcel/watcher-linux-arm64-glibc': 2.5.1
+      '@parcel/watcher-linux-arm64-musl': 2.5.1
+      '@parcel/watcher-linux-x64-glibc': 2.5.1
+      '@parcel/watcher-linux-x64-musl': 2.5.1
+      '@parcel/watcher-win32-arm64': 2.5.1
+      '@parcel/watcher-win32-ia32': 2.5.1
+      '@parcel/watcher-win32-x64': 2.5.1
+    optional: true
+
   '@peculiar/asn1-schema@2.3.13':
     dependencies:
       asn1js: 3.0.5
@@ -7214,207 +7511,92 @@ snapshots:
       '@stablelib/salsa20': 1.0.2
       '@stablelib/wipe': 1.0.1
 
-  '@taquito/core@21.0.0-beta.0':
+  '@taquito/core@24.0.0-beta.0':
     dependencies:
       json-stringify-safe: 5.0.1
 
-  '@taquito/core@21.0.4':
+  '@taquito/http-utils@24.0.0-beta.0(encoding@0.1.13)':
     dependencies:
-      json-stringify-safe: 5.0.1
-
-  '@taquito/core@23.0.0-beta.0':
-    dependencies:
-      json-stringify-safe: 5.0.1
-
-  '@taquito/http-utils@21.0.0-beta.0(encoding@0.1.13)':
-    dependencies:
-      '@taquito/core': 21.0.4
+      '@taquito/core': 24.0.0-beta.0
       node-fetch: 2.7.0(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
 
-  '@taquito/http-utils@21.0.4(encoding@0.1.13)':
+  '@taquito/local-forging@24.0.0-beta.0':
     dependencies:
-      '@taquito/core': 21.0.4
-      node-fetch: 2.7.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - encoding
-
-  '@taquito/http-utils@23.0.0-beta.0(encoding@0.1.13)':
-    dependencies:
-      '@taquito/core': 23.0.0-beta.0
-      node-fetch: 2.7.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - encoding
-
-  '@taquito/local-forging@21.0.0-beta.0':
-    dependencies:
-      '@taquito/core': 21.0.4
-      '@taquito/utils': 21.0.4
+      '@taquito/core': 24.0.0-beta.0
+      '@taquito/utils': 24.0.0-beta.0
       bignumber.js: 9.1.2
+      fast-text-encoding: 1.0.6
+      whatwg-url: 14.2.0
 
-  '@taquito/local-forging@21.0.4':
+  '@taquito/michel-codec@24.0.0-beta.0':
     dependencies:
-      '@taquito/core': 21.0.4
-      '@taquito/utils': 21.0.4
-      bignumber.js: 9.1.2
+      '@taquito/core': 24.0.0-beta.0
 
-  '@taquito/local-forging@23.0.0-beta.0':
+  '@taquito/michelson-encoder@24.0.0-beta.0(encoding@0.1.13)':
     dependencies:
-      '@taquito/core': 23.0.0-beta.0
-      '@taquito/utils': 23.0.0-beta.0
-      bignumber.js: 9.1.2
-
-  '@taquito/michel-codec@21.0.4':
-    dependencies:
-      '@taquito/core': 21.0.4
-
-  '@taquito/michel-codec@23.0.0-beta.0':
-    dependencies:
-      '@taquito/core': 23.0.0-beta.0
-
-  '@taquito/michelson-encoder@21.0.4(encoding@0.1.13)':
-    dependencies:
-      '@taquito/core': 21.0.4
-      '@taquito/rpc': 21.0.4(encoding@0.1.13)
-      '@taquito/utils': 21.0.4
+      '@taquito/core': 24.0.0-beta.0
+      '@taquito/rpc': 24.0.0-beta.0(encoding@0.1.13)
+      '@taquito/signer': 24.0.0-beta.0
+      '@taquito/utils': 24.0.0-beta.0
       bignumber.js: 9.1.2
       fast-json-stable-stringify: 2.1.0
     transitivePeerDependencies:
       - encoding
 
-  '@taquito/michelson-encoder@23.0.0-beta.0(encoding@0.1.13)':
+  '@taquito/rpc@24.0.0-beta.0(encoding@0.1.13)':
     dependencies:
-      '@taquito/core': 23.0.0-beta.0
-      '@taquito/rpc': 23.0.0-beta.0(encoding@0.1.13)
-      '@taquito/utils': 23.0.0-beta.0
+      '@taquito/core': 24.0.0-beta.0
+      '@taquito/http-utils': 24.0.0-beta.0(encoding@0.1.13)
+      '@taquito/utils': 24.0.0-beta.0
       bignumber.js: 9.1.2
-      fast-json-stable-stringify: 2.1.0
+      whatwg-url: 14.2.0
     transitivePeerDependencies:
       - encoding
 
-  '@taquito/rpc@21.0.4(encoding@0.1.13)':
+  '@taquito/signer@24.0.0-beta.0':
     dependencies:
-      '@taquito/core': 21.0.4
-      '@taquito/http-utils': 21.0.4(encoding@0.1.13)
-      '@taquito/utils': 21.0.4
-      bignumber.js: 9.1.2
-    transitivePeerDependencies:
-      - encoding
-
-  '@taquito/rpc@23.0.0-beta.0(encoding@0.1.13)':
-    dependencies:
-      '@taquito/core': 23.0.0-beta.0
-      '@taquito/http-utils': 23.0.0-beta.0(encoding@0.1.13)
-      '@taquito/utils': 23.0.0-beta.0
-      bignumber.js: 9.1.2
-    transitivePeerDependencies:
-      - encoding
-
-  '@taquito/signer@21.0.0-beta.0(encoding@0.1.13)':
-    dependencies:
+      '@noble/curves': 1.9.7
       '@stablelib/blake2b': 1.0.1
       '@stablelib/ed25519': 1.0.3
       '@stablelib/hmac': 1.0.1
       '@stablelib/nacl': 1.0.4
       '@stablelib/pbkdf2': 1.0.1
       '@stablelib/sha512': 1.0.1
-      '@taquito/core': 21.0.0-beta.0
-      '@taquito/taquito': 21.0.4(encoding@0.1.13)
-      '@taquito/utils': 21.0.4
+      '@taquito/core': 24.0.0-beta.0
+      '@taquito/utils': 24.0.0-beta.0
       '@types/bn.js': 5.1.6
       bip39: 3.1.0
-      elliptic: 6.6.1
-      pbkdf2: 3.1.2
+      pbkdf2: 3.1.5
       typedarray-to-buffer: 4.0.0
-    transitivePeerDependencies:
-      - encoding
 
-  '@taquito/signer@23.0.0-beta.0(encoding@0.1.13)':
+  '@taquito/taquito@24.0.0-beta.0(encoding@0.1.13)':
     dependencies:
-      '@stablelib/blake2b': 1.0.1
-      '@stablelib/ed25519': 1.0.3
-      '@stablelib/hmac': 1.0.1
-      '@stablelib/nacl': 1.0.4
-      '@stablelib/pbkdf2': 1.0.1
-      '@stablelib/sha512': 1.0.1
-      '@taquito/core': 23.0.0-beta.0
-      '@taquito/taquito': 23.0.0-beta.0(encoding@0.1.13)
-      '@taquito/utils': 23.0.0-beta.0
-      '@types/bn.js': 5.1.6
-      bip39: 3.1.0
-      elliptic: 6.6.1
-      pbkdf2: 3.1.2
-      typedarray-to-buffer: 4.0.0
-    transitivePeerDependencies:
-      - encoding
-
-  '@taquito/taquito@21.0.0-beta.0(encoding@0.1.13)':
-    dependencies:
-      '@taquito/core': 21.0.0-beta.0
-      '@taquito/http-utils': 21.0.0-beta.0(encoding@0.1.13)
-      '@taquito/local-forging': 21.0.0-beta.0
-      '@taquito/michel-codec': 21.0.4
-      '@taquito/michelson-encoder': 21.0.4(encoding@0.1.13)
-      '@taquito/rpc': 21.0.4(encoding@0.1.13)
-      '@taquito/utils': 21.0.4
-      bignumber.js: 9.1.2
-      rxjs: 7.8.1
-    transitivePeerDependencies:
-      - encoding
-
-  '@taquito/taquito@21.0.4(encoding@0.1.13)':
-    dependencies:
-      '@taquito/core': 21.0.4
-      '@taquito/http-utils': 21.0.4(encoding@0.1.13)
-      '@taquito/local-forging': 21.0.4
-      '@taquito/michel-codec': 21.0.4
-      '@taquito/michelson-encoder': 21.0.4(encoding@0.1.13)
-      '@taquito/rpc': 21.0.4(encoding@0.1.13)
-      '@taquito/utils': 21.0.4
+      '@taquito/core': 24.0.0-beta.0
+      '@taquito/http-utils': 24.0.0-beta.0(encoding@0.1.13)
+      '@taquito/local-forging': 24.0.0-beta.0
+      '@taquito/michel-codec': 24.0.0-beta.0
+      '@taquito/michelson-encoder': 24.0.0-beta.0(encoding@0.1.13)
+      '@taquito/rpc': 24.0.0-beta.0(encoding@0.1.13)
+      '@taquito/signer': 24.0.0-beta.0
+      '@taquito/utils': 24.0.0-beta.0
       bignumber.js: 9.1.2
       rxjs: 7.8.2
     transitivePeerDependencies:
       - encoding
 
-  '@taquito/taquito@23.0.0-beta.0(encoding@0.1.13)':
+  '@taquito/utils@24.0.0-beta.0':
     dependencies:
-      '@taquito/core': 23.0.0-beta.0
-      '@taquito/http-utils': 23.0.0-beta.0(encoding@0.1.13)
-      '@taquito/local-forging': 23.0.0-beta.0
-      '@taquito/michel-codec': 23.0.0-beta.0
-      '@taquito/michelson-encoder': 23.0.0-beta.0(encoding@0.1.13)
-      '@taquito/rpc': 23.0.0-beta.0(encoding@0.1.13)
-      '@taquito/utils': 23.0.0-beta.0
-      bignumber.js: 9.1.2
-      rxjs: 7.8.2
-    transitivePeerDependencies:
-      - encoding
-
-  '@taquito/utils@21.0.4':
-    dependencies:
+      '@noble/curves': 1.9.7
       '@stablelib/blake2b': 1.0.1
       '@stablelib/ed25519': 1.0.3
-      '@taquito/core': 21.0.4
+      '@taquito/core': 24.0.0-beta.0
       '@types/bs58check': 2.1.2
       bignumber.js: 9.1.2
       blakejs: 1.2.1
       bs58check: 3.0.1
       buffer: 6.0.3
-      elliptic: 6.6.1
-      typedarray-to-buffer: 4.0.0
-
-  '@taquito/utils@23.0.0-beta.0':
-    dependencies:
-      '@stablelib/blake2b': 1.0.1
-      '@stablelib/ed25519': 1.0.3
-      '@taquito/core': 23.0.0-beta.0
-      '@types/bs58check': 2.1.2
-      bignumber.js: 9.1.2
-      blakejs: 1.2.1
-      bs58check: 3.0.1
-      buffer: 6.0.3
-      elliptic: 6.6.1
       typedarray-to-buffer: 4.0.0
 
   '@tsconfig/node10@1.0.11': {}
@@ -7463,11 +7645,11 @@ snapshots:
 
   '@types/bn.js@5.1.6':
     dependencies:
-      '@types/node': 20.16.10
+      '@types/node': 22.7.5
 
   '@types/bs58check@2.1.2':
     dependencies:
-      '@types/node': 20.16.10
+      '@types/node': 22.7.5
 
   '@types/cross-spawn@6.0.6':
     dependencies:
@@ -7493,7 +7675,7 @@ snapshots:
 
   '@types/http-proxy@1.17.15':
     dependencies:
-      '@types/node': 20.16.10
+      '@types/node': 22.7.5
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
@@ -7591,14 +7773,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@4.3.4(vite@6.2.5(@types/node@22.7.5)(yaml@2.7.1))':
+  '@vitejs/plugin-react@4.3.4(vite@6.2.5(@types/node@22.7.5)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(yaml@2.7.1))':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.26.10)
       '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.10)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 6.2.5(@types/node@22.7.5)(yaml@2.7.1)
+      vite: 6.2.5(@types/node@22.7.5)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(yaml@2.7.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -7716,6 +7898,9 @@ snapshots:
 
   acorn@8.12.1: {}
 
+  acorn@8.15.0:
+    optional: true
+
   add-stream@1.0.0: {}
 
   agent-base@7.1.1:
@@ -7810,6 +7995,10 @@ snapshots:
 
   at-least-node@1.0.0: {}
 
+  available-typed-arrays@1.0.7:
+    dependencies:
+      possible-typed-array-names: 1.1.0
+
   axios@1.8.4:
     dependencies:
       follow-redirects: 1.15.9
@@ -7822,6 +8011,20 @@ snapshots:
     dependencies:
       tunnel: 0.0.6
       typed-rest-client: 1.8.11
+
+  babel-jest@29.7.0(@babel/core@7.25.2):
+    dependencies:
+      '@babel/core': 7.25.2
+      '@jest/transform': 29.7.0
+      '@types/babel__core': 7.20.5
+      babel-plugin-istanbul: 6.1.1
+      babel-preset-jest: 29.6.3(@babel/core@7.25.2)
+      chalk: 4.1.2
+      graceful-fs: 4.2.11
+      slash: 3.0.0
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
 
   babel-jest@29.7.0(@babel/core@7.26.10):
     dependencies:
@@ -7853,6 +8056,26 @@ snapshots:
       '@types/babel__core': 7.20.5
       '@types/babel__traverse': 7.20.6
 
+  babel-preset-current-node-syntax@1.1.0(@babel/core@7.25.2):
+    dependencies:
+      '@babel/core': 7.25.2
+      '@babel/plugin-syntax-async-generators': 7.8.4(@babel/core@7.25.2)
+      '@babel/plugin-syntax-bigint': 7.8.3(@babel/core@7.25.2)
+      '@babel/plugin-syntax-class-properties': 7.12.13(@babel/core@7.25.2)
+      '@babel/plugin-syntax-class-static-block': 7.14.5(@babel/core@7.25.2)
+      '@babel/plugin-syntax-import-attributes': 7.25.6(@babel/core@7.25.2)
+      '@babel/plugin-syntax-import-meta': 7.10.4(@babel/core@7.25.2)
+      '@babel/plugin-syntax-json-strings': 7.8.3(@babel/core@7.25.2)
+      '@babel/plugin-syntax-logical-assignment-operators': 7.10.4(@babel/core@7.25.2)
+      '@babel/plugin-syntax-nullish-coalescing-operator': 7.8.3(@babel/core@7.25.2)
+      '@babel/plugin-syntax-numeric-separator': 7.10.4(@babel/core@7.25.2)
+      '@babel/plugin-syntax-object-rest-spread': 7.8.3(@babel/core@7.25.2)
+      '@babel/plugin-syntax-optional-catch-binding': 7.8.3(@babel/core@7.25.2)
+      '@babel/plugin-syntax-optional-chaining': 7.8.3(@babel/core@7.25.2)
+      '@babel/plugin-syntax-private-property-in-object': 7.14.5(@babel/core@7.25.2)
+      '@babel/plugin-syntax-top-level-await': 7.14.5(@babel/core@7.25.2)
+    optional: true
+
   babel-preset-current-node-syntax@1.1.0(@babel/core@7.26.10):
     dependencies:
       '@babel/core': 7.26.10
@@ -7871,6 +8094,13 @@ snapshots:
       '@babel/plugin-syntax-optional-chaining': 7.8.3(@babel/core@7.26.10)
       '@babel/plugin-syntax-private-property-in-object': 7.14.5(@babel/core@7.26.10)
       '@babel/plugin-syntax-top-level-await': 7.14.5(@babel/core@7.26.10)
+
+  babel-preset-jest@29.6.3(@babel/core@7.25.2):
+    dependencies:
+      '@babel/core': 7.25.2
+      babel-plugin-jest-hoist: 29.6.3
+      babel-preset-current-node-syntax: 1.1.0(@babel/core@7.25.2)
+    optional: true
 
   babel-preset-jest@29.6.3(@babel/core@7.26.10):
     dependencies:
@@ -7901,7 +8131,7 @@ snapshots:
 
   bip39@3.1.0:
     dependencies:
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.8.0
 
   bl@4.1.0:
     dependencies:
@@ -7953,7 +8183,7 @@ snapshots:
 
   bs58check@3.0.1:
     dependencies:
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.8.0
       bs58: 5.0.0
 
   bser@2.1.1:
@@ -8012,6 +8242,18 @@ snapshots:
       function-bind: 1.1.2
       get-intrinsic: 1.2.4
       set-function-length: 1.2.2
+
+  call-bind@1.0.8:
+    dependencies:
+      call-bind-apply-helpers: 1.0.2
+      es-define-property: 1.0.1
+      get-intrinsic: 1.3.0
+      set-function-length: 1.2.2
+
+  call-bound@1.0.4:
+    dependencies:
+      call-bind-apply-helpers: 1.0.2
+      get-intrinsic: 1.3.0
 
   callsites@3.1.0: {}
 
@@ -8205,6 +8447,9 @@ snapshots:
       delayed-stream: 1.0.0
 
   commander@12.1.0: {}
+
+  commander@2.20.3:
+    optional: true
 
   commander@4.1.1: {}
 
@@ -8409,9 +8654,9 @@ snapshots:
 
   define-data-property@1.1.4:
     dependencies:
-      es-define-property: 1.0.0
+      es-define-property: 1.0.1
       es-errors: 1.3.0
-      gopd: 1.0.1
+      gopd: 1.2.0
 
   define-lazy-prop@2.0.0: {}
 
@@ -8420,6 +8665,9 @@ snapshots:
   deprecation@2.3.1: {}
 
   detect-indent@5.0.0: {}
+
+  detect-libc@1.0.3:
+    optional: true
 
   detect-newline@3.1.0: {}
 
@@ -8697,6 +8945,8 @@ snapshots:
 
   fast-json-stable-stringify@2.1.0: {}
 
+  fast-text-encoding@1.0.6: {}
+
   fastq@1.17.1:
     dependencies:
       reusify: 1.0.4
@@ -8768,6 +9018,10 @@ snapshots:
       sanctuary-type-identifiers: 3.0.0
 
   follow-redirects@1.15.9: {}
+
+  for-each@0.3.5:
+    dependencies:
+      is-callable: 1.2.7
 
   foreground-child@3.3.0:
     dependencies:
@@ -8949,10 +9203,6 @@ snapshots:
       merge2: 1.4.1
       slash: 3.0.0
 
-  gopd@1.0.1:
-    dependencies:
-      get-intrinsic: 1.3.0
-
   gopd@1.2.0: {}
 
   graceful-fs@4.2.11: {}
@@ -8976,7 +9226,7 @@ snapshots:
 
   has-property-descriptors@1.0.2:
     dependencies:
-      es-define-property: 1.0.0
+      es-define-property: 1.0.1
 
   has-proto@1.0.3: {}
 
@@ -8995,6 +9245,13 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.2
       safe-buffer: 5.2.1
+
+  hash-base@3.1.2:
+    dependencies:
+      inherits: 2.0.4
+      readable-stream: 2.3.8
+      safe-buffer: 5.2.1
+      to-buffer: 1.2.2
 
   hash.js@1.1.7:
     dependencies:
@@ -9097,6 +9354,9 @@ snapshots:
 
   immediate@3.0.6: {}
 
+  immutable@5.1.4:
+    optional: true
+
   import-fresh@3.3.1:
     dependencies:
       parent-module: 1.0.1
@@ -9163,6 +9423,8 @@ snapshots:
     dependencies:
       binary-extensions: 2.3.0
 
+  is-callable@1.2.7: {}
+
   is-ci@3.0.1:
     dependencies:
       ci-info: 3.9.0
@@ -9226,6 +9488,10 @@ snapshots:
   is-text-path@1.0.1:
     dependencies:
       text-extensions: 1.9.0
+
+  is-typed-array@1.1.15:
+    dependencies:
+      which-typed-array: 1.1.19
 
   is-unicode-supported@0.1.0: {}
 
@@ -9677,7 +9943,7 @@ snapshots:
   jest-util@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.16.10
+      '@types/node': 22.7.5
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -9705,7 +9971,7 @@ snapshots:
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 20.16.10
+      '@types/node': 22.7.5
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -9733,6 +9999,9 @@ snapshots:
       - babel-plugin-macros
       - supports-color
       - ts-node
+
+  jiti@1.21.7:
+    optional: true
 
   joycon@3.1.1: {}
 
@@ -10288,6 +10557,9 @@ snapshots:
 
   neo-async@2.6.2: {}
 
+  node-addon-api@7.1.1:
+    optional: true
+
   node-domexception@1.0.0: {}
 
   node-fetch-commonjs@3.3.2:
@@ -10303,7 +10575,7 @@ snapshots:
 
   node-fetch@2.7.0(encoding@0.1.13):
     dependencies:
-      whatwg-url: 14.0.0
+      whatwg-url: 14.2.0
     optionalDependencies:
       encoding: 0.1.13
 
@@ -10703,13 +10975,14 @@ snapshots:
 
   path-type@4.0.0: {}
 
-  pbkdf2@3.1.2:
+  pbkdf2@3.1.5:
     dependencies:
       create-hash: 1.2.0
       create-hmac: 1.1.7
-      ripemd160: 2.0.2
+      ripemd160: 2.0.3
       safe-buffer: 5.2.1
-      sha.js: 2.4.11
+      sha.js: 2.4.12
+      to-buffer: 1.2.2
 
   pend@1.2.0: {}
 
@@ -10745,10 +11018,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  postcss-load-config@6.0.1(postcss@8.5.3)(yaml@2.7.1):
+  possible-typed-array-names@1.1.0: {}
+
+  postcss-load-config@6.0.1(jiti@1.21.7)(postcss@8.5.3)(yaml@2.7.1):
     dependencies:
       lilconfig: 3.1.3
     optionalDependencies:
+      jiti: 1.21.7
       postcss: 8.5.3
       yaml: 2.7.1
 
@@ -10972,11 +11248,16 @@ snapshots:
 
   rimraf@5.0.10:
     dependencies:
-      glob: 11.0.0
+      glob: 11.0.1
 
   ripemd160@2.0.2:
     dependencies:
       hash-base: 3.1.0
+      inherits: 2.0.4
+
+  ripemd160@2.0.3:
+    dependencies:
+      hash-base: 3.1.2
       inherits: 2.0.4
 
   rollup@4.39.0:
@@ -11029,6 +11310,15 @@ snapshots:
 
   sanctuary-type-identifiers@3.0.0: {}
 
+  sass@1.97.1:
+    dependencies:
+      chokidar: 4.0.3
+      immutable: 5.1.4
+      source-map-js: 1.2.1
+    optionalDependencies:
+      '@parcel/watcher': 2.5.1
+    optional: true
+
   sax@1.4.1: {}
 
   scheduler@0.20.2:
@@ -11053,8 +11343,8 @@ snapshots:
       define-data-property: 1.1.4
       es-errors: 1.3.0
       function-bind: 1.1.2
-      get-intrinsic: 1.2.4
-      gopd: 1.0.1
+      get-intrinsic: 1.3.0
+      gopd: 1.2.0
       has-property-descriptors: 1.0.2
 
   setimmediate@1.0.5: {}
@@ -11063,6 +11353,12 @@ snapshots:
     dependencies:
       inherits: 2.0.4
       safe-buffer: 5.2.1
+
+  sha.js@2.4.12:
+    dependencies:
+      inherits: 2.0.4
+      safe-buffer: 5.2.1
+      to-buffer: 1.2.2
 
   shallow-clone@3.0.1:
     dependencies:
@@ -11141,6 +11437,12 @@ snapshots:
     dependencies:
       buffer-from: 1.1.2
       source-map: 0.6.1
+
+  source-map-support@0.5.21:
+    dependencies:
+      buffer-from: 1.1.2
+      source-map: 0.6.1
+    optional: true
 
   source-map@0.5.6: {}
 
@@ -11325,6 +11627,14 @@ snapshots:
 
   temp-dir@1.0.0: {}
 
+  terser@5.44.1:
+    dependencies:
+      '@jridgewell/source-map': 0.3.11
+      acorn: 8.15.0
+      commander: 2.20.3
+      source-map-support: 0.5.21
+    optional: true
+
   test-exclude@6.0.0:
     dependencies:
       '@istanbuljs/schema': 0.1.3
@@ -11379,6 +11689,12 @@ snapshots:
 
   tmpl@1.0.5: {}
 
+  to-buffer@1.2.2:
+    dependencies:
+      isarray: 2.0.5
+      safe-buffer: 5.2.1
+      typed-array-buffer: 1.0.3
+
   to-fast-properties@2.0.0: {}
 
   to-regex-range@5.0.1:
@@ -11392,10 +11708,6 @@ snapshots:
       universalify: 0.2.0
       url-parse: 1.5.10
 
-  tr46@5.0.0:
-    dependencies:
-      punycode: 2.3.1
-
   tr46@5.1.0:
     dependencies:
       punycode: 2.3.1
@@ -11408,7 +11720,7 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
-  ts-jest@29.2.5(@babel/core@7.26.10)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.10))(esbuild@0.25.2)(jest@29.7.0(@types/node@17.0.45)(ts-node@10.9.2(@types/node@17.0.45)(typescript@5.6.2)))(typescript@5.6.2):
+  ts-jest@29.2.5(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))(esbuild@0.25.2)(jest@29.7.0(@types/node@17.0.45)(ts-node@10.9.2(@types/node@17.0.45)(typescript@5.6.2)))(typescript@5.6.2):
     dependencies:
       bs-logger: 0.2.6
       ejs: 3.1.10
@@ -11422,10 +11734,10 @@ snapshots:
       typescript: 5.6.2
       yargs-parser: 21.1.1
     optionalDependencies:
-      '@babel/core': 7.26.10
+      '@babel/core': 7.25.2
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
-      babel-jest: 29.7.0(@babel/core@7.26.10)
+      babel-jest: 29.7.0(@babel/core@7.25.2)
       esbuild: 0.25.2
 
   ts-jest@29.2.5(@babel/core@7.26.10)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.10))(esbuild@0.25.2)(jest@29.7.0(@types/node@20.16.10)(ts-node@10.9.2(@types/node@20.16.10)(typescript@5.6.2)))(typescript@5.6.2):
@@ -11560,7 +11872,7 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tsup@8.4.0(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1):
+  tsup@8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.6.2)(yaml@2.7.1):
     dependencies:
       bundle-require: 5.1.0(esbuild@0.25.2)
       cac: 6.7.14
@@ -11570,7 +11882,7 @@ snapshots:
       esbuild: 0.25.2
       joycon: 3.1.1
       picocolors: 1.1.1
-      postcss-load-config: 6.0.1(postcss@8.5.3)(yaml@2.7.1)
+      postcss-load-config: 6.0.1(jiti@1.21.7)(postcss@8.5.3)(yaml@2.7.1)
       resolve-from: 5.0.0
       rollup: 4.39.0
       source-map: 0.8.0-beta.0
@@ -11613,6 +11925,12 @@ snapshots:
   type-fest@0.6.0: {}
 
   type-fest@0.8.1: {}
+
+  typed-array-buffer@1.0.3:
+    dependencies:
+      call-bound: 1.0.4
+      es-errors: 1.3.0
+      is-typed-array: 1.1.15
 
   typed-rest-client@1.8.11:
     dependencies:
@@ -11687,13 +12005,13 @@ snapshots:
 
   validate-npm-package-name@5.0.1: {}
 
-  vite-plugin-singlefile@1.0.0(rollup@4.39.0)(vite@6.2.5(@types/node@22.7.5)(yaml@2.7.1)):
+  vite-plugin-singlefile@1.0.0(rollup@4.39.0)(vite@6.2.5(@types/node@22.7.5)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(yaml@2.7.1)):
     dependencies:
       micromatch: 4.0.8
       rollup: 4.39.0
-      vite: 6.2.5(@types/node@22.7.5)(yaml@2.7.1)
+      vite: 6.2.5(@types/node@22.7.5)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(yaml@2.7.1)
 
-  vite@6.2.5(@types/node@22.7.5)(yaml@2.7.1):
+  vite@6.2.5(@types/node@22.7.5)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(yaml@2.7.1):
     dependencies:
       esbuild: 0.25.2
       postcss: 8.5.3
@@ -11701,6 +12019,9 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.7.5
       fsevents: 2.3.3
+      jiti: 1.21.7
+      sass: 1.97.1
+      terser: 5.44.1
       yaml: 2.7.1
 
   walk-up-path@3.0.1: {}
@@ -11731,17 +12052,22 @@ snapshots:
 
   whatwg-mimetype@4.0.0: {}
 
-  whatwg-url@14.0.0:
-    dependencies:
-      tr46: 5.0.0
-      webidl-conversions: 7.0.0
-
   whatwg-url@14.2.0:
     dependencies:
       tr46: 5.1.0
       webidl-conversions: 7.0.0
 
   which-module@2.0.1: {}
+
+  which-typed-array@1.1.19:
+    dependencies:
+      available-typed-arrays: 1.0.7
+      call-bind: 1.0.8
+      call-bound: 1.0.4
+      for-each: 0.3.5
+      get-proto: 1.0.1
+      gopd: 1.2.0
+      has-tostringtag: 1.0.2
 
   which@2.0.2:
     dependencies:

@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-tezbox",
-	"version": "0.78.0",
+	"version": "0.78.1",
 	"description": "A plugin for Taqueria providing local sandbox capabilities built on TezBox",
 	"keywords": [
 		"taqueria",
@@ -36,7 +36,7 @@
 	"dependencies": {
 		"@taqueria/node-sdk": "workspace:*",
 		"@taqueria/protocol": "workspace:*",
-		"@taquito/signer": "^21.0.0-beta.0",
+		"@taquito/signer": "24.0.0-beta.0",
 		"@types/hjson": "^2.4.6",
 		"async-retry": "^1.3.3",
 		"bignumber.js": "^9.1.2",

@@ -34,9 +34,9 @@ import { get, getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
 import { LikeAPromise, pluginDefiner, PluginSchema, StdIO } from './types';
 
-import { importKey, InMemorySigner } from '@taquito/signer';
-import { TezosToolkit } from '@taquito/taquito';
-import { b58cencode, Prefix, prefix } from '@taquito/utils';
+import { InMemorySigner } from '@taquito/signer';
+import { importKey, TezosToolkit } from '@taquito/taquito';
+import { b58Encode, PrefixV2 } from '@taquito/utils';
 import * as Bip39 from 'bip39';
 import crypto from 'crypto';
 
@@ -698,7 +698,7 @@ const createAddress = async (network: Protocol.NetworkConfig.t): Promise<TezosTo
 	const tezos = new TezosToolkit(network.rpcUrl as string);
 	const keyBytes = Buffer.alloc(32);
 	crypto.randomFillSync(keyBytes);
-	const key = b58cencode(new Uint8Array(keyBytes), prefix[Prefix.P2SK]);
+	const key = b58Encode(new Uint8Array(keyBytes), PrefixV2.P256SecretKey);
 	await importKey(tezos, key);
 	return tezos;
 };
