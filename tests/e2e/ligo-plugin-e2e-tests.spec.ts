@@ -15,7 +15,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			process.env.PATH = `${projectDir}:${process.env.PATH}`;
 			const { waitForText } = await spawn('taq', 'init test-project');
 			let testLigoPath = join(projectDir, 'ligo');
-			await writeFile(testLigoPath, '#!/bin/sh\necho Hello from test ligo');
+			await writeFile(testLigoPath, '#!/usr/bin/env sh\necho Hello from test ligo');
 			await exec(`chmod +x ${testLigoPath}`);
 			await waitForText("Project taq'ified!");
 			const { stdout: stdout1, stderr: stderr1 } = await execute(
@@ -27,7 +27,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 				expect.arrayContaining(['Plugin installed successfully']),
 			);
 
-			const script = `#!/bin/bash
+			const script = `#!/usr/bin/env bash
 			PATH="${process.env.PATH}"
 			cd ${join(projectDir, 'test-project')}
 			taq ligo --command help
