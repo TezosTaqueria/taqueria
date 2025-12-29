@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-metadata",
-	"version": "0.78.3",
+	"version": "0.78.4",
 	"description": "A plugin for Taqueria providing metadata creation and validation.",
 	"keywords": [
 		"taqueria",
