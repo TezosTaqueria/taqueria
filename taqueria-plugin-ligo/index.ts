@@ -4,7 +4,7 @@ import * as templates from './ligo_templates';
 configurePlugin({
 	name: '@taqueria/plugin-ligo',
 	alias: 'ligo',
-	dockerImage: 'ligolang/ligo:1.9.2',
+	dockerImage: 'ligolang/ligo:1.12.1',
 	dockerImageEnvVar: 'TAQ_LIGO_IMAGE',
 	canUseLIGOBinary: true,
 	unparsedArgs: process.argv,
