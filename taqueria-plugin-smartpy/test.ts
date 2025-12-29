@@ -2,13 +2,22 @@ import { execCmd, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria
 import { copyFile, mkdir, readdir, readFile } from 'fs/promises';
 import os from 'os';
 import { basename, join } from 'path';
-import { emitExternalError, getCmdEnvVars, getInputFilenameAbsPath, getSmartPyTempDir, TestOpts } from './common';
+import {
+	emitExternalError,
+	getCmdEnvVars,
+	getInputFilenameAbsPath,
+	getPythonCommand,
+	getSmartPyTempDir,
+	TestOpts,
+} from './common';
 
 const testCommand = (parsedArgs: TestOpts) => {
 	const envVars = getCmdEnvVars(parsedArgs);
 	const testFileAbspath = getInputFilenameAbsPath(parsedArgs, parsedArgs.sourceFile);
+	const projectDir = parsedArgs.projectDir;
+	const pythonCmd = getPythonCommand(projectDir);
 
-	const cmd = `${envVars}python ${testFileAbspath}`;
+	const cmd = `${envVars}${pythonCmd} ${testFileAbspath}`;
 
 	return cmd;
 };

@@ -16,6 +16,7 @@ import {
 	getCmdEnvVars,
 	getInputFilenameAbsPath,
 	getInputFilenameRelPath,
+	getPythonCommand,
 	isParameterListFile,
 	isSmartPyFile,
 	isStorageListFile,
@@ -40,7 +41,8 @@ const getCompileContractCmd = async (parsedArgs: Opts, sourceFile: string): Prom
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw new Error(`No project directory provided`);
 	const envVars = getCmdEnvVars(parsedArgs);
-	const cmd = `${envVars}python ${__dirname}/wrapper.py ${getInputFilenameAbsPath(parsedArgs, sourceFile)} '${
+	const pythonCmd = getPythonCommand(projectDir);
+	const cmd = `${envVars}${pythonCmd} ${__dirname}/wrapper.py ${getInputFilenameAbsPath(parsedArgs, sourceFile)} '${
 		JSON.stringify(parsedArgs)
 	}'`;
 	return cmd;

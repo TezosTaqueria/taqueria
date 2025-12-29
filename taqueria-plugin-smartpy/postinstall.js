@@ -1,4 +1,6 @@
 const { exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 const runCommand = (command) => {
   return new Promise((resolve, reject) => {
@@ -10,10 +12,6 @@ const runCommand = (command) => {
       }
     });
   });
-};
-
-const osType = () => {
-  return process.platform === 'darwin' ? 'mac' : 'linux';
 };
 
 const checkPackageManager = async () => {
@@ -60,25 +58,59 @@ const checkPython = async (manager) => {
   return '✖';
 };
 
+// Track whether we're using a venv (when global pip isn't available)
+let useVenv = false;
+
+// Venv is created in the project's .taq folder
+const getVenvPath = () => path.join(process.cwd(), '.taq', 'smartpy-venv');
+
+const ensureVenvExists = async () => {
+  const venvPath = getVenvPath();
+  if (!fs.existsSync(`${venvPath}/bin/pip`)) {
+    console.log(`Creating SmartPy venv at ${venvPath}...`);
+    // Use Python's built-in venv module (available in Python 3.3+)
+    await runCommand(`python3 -m venv ${venvPath}`);
+    // Upgrade pip in the venv
+    await runCommand(`${venvPath}/bin/pip install --upgrade pip`);
+  }
+};
+
 const checkPip = async (manager) => {
   try {
     await runCommand('pip --version');
     return '✔';
   } catch {
-    installHints(manager, 'python3-pip');
-    return '✖';
+    // Global pip not found - create a venv with pip
+    try {
+      useVenv = true;
+      await ensureVenvExists();
+      return '✔ (using venv)';
+    } catch (err) {
+      console.log(`Failed to create venv: ${err}`);
+      if (manager === 'apt') {
+        console.log('On Debian/Ubuntu, you may need: sudo apt install python3-venv');
+      }
+      installHints(manager, 'python3-pip');
+      return '✖';
+    }
   }
 };
+
+const getPipCommand = () => useVenv ? `${getVenvPath()}/bin/pip` : 'pip';
 
 const checkSmartPy = async (pythonCheck, pipCheck) => {
   if (pythonCheck === '✖' || pipCheck === '✖') return '✖';
 
+  const pip = getPipCommand();
+
   try {
-    const version = await runCommand('pip show smartpy | grep Version');
-    if (parseFloat(version.split(' ')[1].replace('a', '')) >= 0.22) return '✔';
+    // Check for smartpy-tezos (PyPI package name)
+    const version = await runCommand(`${pip} show smartpy-tezos | grep Version`);
+    return '✔';
   } catch {
     try {
-      await runCommand('pip install https://smartpy.io/static/tezos_smartpy-0.22.0-py3-none-any.whl');
+      // Install from PyPI
+      await runCommand(`${pip} install smartpy-tezos`);
       return '✔';
     } catch {
       console.log('Failed to install SmartPy.');

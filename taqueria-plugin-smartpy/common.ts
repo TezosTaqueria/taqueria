@@ -1,8 +1,19 @@
 import { getDockerImage, sendErr } from '@taqueria/node-sdk';
 import { ProxyTaskArgs, RequestArgs } from '@taqueria/node-sdk/types';
-import { mkdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import os from 'os';
 import { join } from 'path';
+
+// Venv is created in the project's .taq folder
+export const getVenvPath = (projectDir: string): string => join(projectDir, '.taq', 'smartpy-venv');
+
+export const getPythonCommand = (projectDir: string): string => {
+	const venvPython = join(getVenvPath(projectDir), 'bin', 'python');
+	if (existsSync(venvPython)) {
+		return venvPython;
+	}
+	return 'python';
+};
 
 export interface SmartPyOpts extends ProxyTaskArgs.t {
 	command: string;

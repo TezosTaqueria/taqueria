@@ -183,3 +183,5 @@ tests/e2e/data/smartpy-data/__pycache__
 
 /.npmrc
 .aider*
+.direnv/
+CLAUDE.md
