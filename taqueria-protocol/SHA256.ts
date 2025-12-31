@@ -1,7 +1,6 @@
 import createType from '@taqueria/protocol/Base';
 import { E_TaqError, TaqError } from '@taqueria/protocol/TaqError';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
-import { has } from 'rambda';
 import { z } from 'zod';
 
 const eager = <T>(f: Future<TaqError, T>) =>
@@ -27,7 +26,7 @@ export class Crypto {
 declare var crypto: Crypto;
 
 const getSubtleCrypto = async () => {
-	if (has('SubtleCrypto', globalThis)) {
+	if (Object.hasOwn(globalThis, 'SubtleCrypto')) {
 		return Promise.resolve(crypto.subtle);
 	}
 

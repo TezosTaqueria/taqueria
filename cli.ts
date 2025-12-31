@@ -39,7 +39,7 @@ import {
 	resolve,
 } from 'fluture';
 import { identity, pipe } from 'fun';
-import { has, last, uniq } from 'rambda';
+import { last, uniq } from 'rambda';
 import { match, P } from 'ts-pattern';
 import * as Analytics from './analytics.ts';
 import * as NPM from './npm.ts';
@@ -849,7 +849,7 @@ const getTemplateCommandArgs = (parsedArgs: SanitizedArgs.t, state: EphemeralSta
 		const implementation = state.templates[templateName];
 
 		// Get the template
-		const template: ParsedTemplate.t = has('template', implementation)
+		const template: ParsedTemplate.t = Object.hasOwn(implementation, 'template')
 			? implementation as ParsedTemplate.t
 			: getCanonicalTemplate(
 				(implementation as InstalledPlugin.t).name,
@@ -917,7 +917,7 @@ const exposeTemplates = (
 						// We need to determine first if the template is provided by more than one plugin, and if so,
 						// that the plugin option was provided to know which one should be targeted.
 						// We can then see if handling this template should be proxied to the plugin or have a shell command executed
-						const isComposite = has('template', state.templates[parsedArgs.template]);
+						const isComposite = Object.hasOwn(state.templates[parsedArgs.template], 'template');
 
 						if (isComposite) {
 							if (parsedArgs.plugin) {
