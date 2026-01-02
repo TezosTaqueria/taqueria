@@ -1,0 +1,732 @@
+{
+  "version": "6.0",
+  "nxVersion": "22.3.3",
+  "pathMappings": {},
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {},
+    "nonProjectFiles": [
+      {
+        "file": ".gitignore",
+        "hash": "856435729510071818"
+      },
+      {
+        "file": "README.md",
+        "hash": "4687584993700299164"
+      },
+      {
+        "file": "babel.config.js",
+        "hash": "5563741468743396946"
+      },
+      {
+        "file": "blog/2021-12-09-welcome/index.md",
+        "hash": "4343221923000359078"
+      },
+      {
+        "file": "blog/authors.yml",
+        "hash": "11216086497536146303"
+      },
+      {
+        "file": "docs/config/config-files.mdx",
+        "hash": "4629275078756811285"
+      },
+      {
+        "file": "docs/config/environments.mdx",
+        "hash": "2395802089298842276"
+      },
+      {
+        "file": "docs/config/implicit-accounts.mdx",
+        "hash": "1622621100385108789"
+      },
+      {
+        "file": "docs/data-collection-policy.mdx",
+        "hash": "15701059120776796067"
+      },
+      {
+        "file": "docs/features/github-action.mdx",
+        "hash": "7769725413739249709"
+      },
+      {
+        "file": "docs/features/templates.md",
+        "hash": "17053051967224537339"
+      },
+      {
+        "file": "docs/getting-started/contract-dev.mdx",
+        "hash": "56447257483486363"
+      },
+      {
+        "file": "docs/getting-started/installation.mdx",
+        "hash": "17794635623006592288"
+      },
+      {
+        "file": "docs/getting-started/quickstart.mdx",
+        "hash": "18097338011512201153"
+      },
+      {
+        "file": "docs/getting-started/taqueria-workflows.mdx",
+        "hash": "1008391400148705945"
+      },
+      {
+        "file": "docs/glossary.md",
+        "hash": "9084189176746843689"
+      },
+      {
+        "file": "docs/intro.mdx",
+        "hash": "7368484489775439949"
+      },
+      {
+        "file": "docs/libraries/taqueria-state.mdx",
+        "hash": "914535762590125513"
+      },
+      {
+        "file": "docs/libraries/toolkit.md",
+        "hash": "13242159812680264302"
+      },
+      {
+        "file": "docs/plugins.mdx",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "docs/plugins/plugin-archetype.mdx",
+        "hash": "7746962570188932226"
+      },
+      {
+        "file": "docs/plugins/plugin-basics.mdx",
+        "hash": "5640323254280812823"
+      },
+      {
+        "file": "docs/plugins/plugin-contract-types.mdx",
+        "hash": "17342407273809231323"
+      },
+      {
+        "file": "docs/plugins/plugin-core.mdx",
+        "hash": "16710228279177352345"
+      },
+      {
+        "file": "docs/plugins/plugin-flextesa.mdx",
+        "hash": "1751785549545249833"
+      },
+      {
+        "file": "docs/plugins/plugin-ipfs-pinata.mdx",
+        "hash": "17852849433015433574"
+      },
+      {
+        "file": "docs/plugins/plugin-jest.mdx",
+        "hash": "11628578471210502569"
+      },
+      {
+        "file": "docs/plugins/plugin-ligo-legacy.mdx",
+        "hash": "11454818677822994352"
+      },
+      {
+        "file": "docs/plugins/plugin-ligo.mdx",
+        "hash": "8955086336877803626"
+      },
+      {
+        "file": "docs/plugins/plugin-metadata.mdx",
+        "hash": "12539578639282615265"
+      },
+      {
+        "file": "docs/plugins/plugin-octez-client.mdx",
+        "hash": "17568669851754391113"
+      },
+      {
+        "file": "docs/plugins/plugin-smartpy-legacy.mdx",
+        "hash": "6697042724934190416"
+      },
+      {
+        "file": "docs/plugins/plugin-smartpy.mdx",
+        "hash": "3995564945991869788"
+      },
+      {
+        "file": "docs/plugins/plugin-taquito.mdx",
+        "hash": "11514269165554219543"
+      },
+      {
+        "file": "docs/plugins/plugin-tzcompose.mdx",
+        "hash": "17073114096651586404"
+      },
+      {
+        "file": "docs/roadmap.mdx",
+        "hash": "14952356140233703630"
+      },
+      {
+        "file": "docs/scaffolds/scaffold-basics.mdx",
+        "hash": "7380531494082953698"
+      },
+      {
+        "file": "docs/scaffolds/taco-shop.mdx",
+        "hash": "9079163082843894648"
+      },
+      {
+        "file": "docs/scaffolds/tzcompose.mdx",
+        "hash": "10841939374807008732"
+      },
+      {
+        "file": "docs/taqueria-dev/contributions.mdx",
+        "hash": "17088543266548610172"
+      },
+      {
+        "file": "docs/taqueria-dev/making-plugins.mdx",
+        "hash": "6718166052400242749"
+      },
+      {
+        "file": "docs/taqueria-dev/pr-npm-packages.mdx",
+        "hash": "12699648233090397047"
+      },
+      {
+        "file": "docs/taqueria-internals/architecture.mdx",
+        "hash": "16705185549132577470"
+      },
+      {
+        "file": "docs/tasks/bake.md",
+        "hash": "11605913649871512397"
+      },
+      {
+        "file": "docs/tasks/clean.md",
+        "hash": "13266383716710550307"
+      },
+      {
+        "file": "docs/tasks/compile-all.mdx",
+        "hash": "13265684505979265141"
+      },
+      {
+        "file": "docs/tasks/compile.md",
+        "hash": "9965007858461592906"
+      },
+      {
+        "file": "docs/tasks/deploy.md",
+        "hash": "13396011683364307549"
+      },
+      {
+        "file": "docs/tasks/fund.md",
+        "hash": "10860351088744176179"
+      },
+      {
+        "file": "docs/tasks/generate-metadata.md",
+        "hash": "2732666091655171251"
+      },
+      {
+        "file": "docs/tasks/generate-types.md",
+        "hash": "1661882187320224542"
+      },
+      {
+        "file": "docs/tasks/get-environment.md",
+        "hash": "14270365233075424256"
+      },
+      {
+        "file": "docs/tasks/init.md",
+        "hash": "7329439851560480915"
+      },
+      {
+        "file": "docs/tasks/install.md",
+        "hash": "11646851591956531790"
+      },
+      {
+        "file": "docs/tasks/instantiate-account.md",
+        "hash": "17994911752212533605"
+      },
+      {
+        "file": "docs/tasks/ligo.md",
+        "hash": "4266147914056017464"
+      },
+      {
+        "file": "docs/tasks/list-accounts.md",
+        "hash": "16046962278654094050"
+      },
+      {
+        "file": "docs/tasks/opt-in.md",
+        "hash": "1631344986224019488"
+      },
+      {
+        "file": "docs/tasks/opt-out.md",
+        "hash": "9309073294361011434"
+      },
+      {
+        "file": "docs/tasks/originate.md",
+        "hash": "2226703790089109890"
+      },
+      {
+        "file": "docs/tasks/publish.md",
+        "hash": "1072877919613881315"
+      },
+      {
+        "file": "docs/tasks/run.md",
+        "hash": "1407115070508715636"
+      },
+      {
+        "file": "docs/tasks/scaffold.md",
+        "hash": "6526087052201621077"
+      },
+      {
+        "file": "docs/tasks/set-environment.md",
+        "hash": "11513848001457889733"
+      },
+      {
+        "file": "docs/tasks/show-protocols.md",
+        "hash": "1549190922725195331"
+      },
+      {
+        "file": "docs/tasks/simulate.md",
+        "hash": "17743324365992260515"
+      },
+      {
+        "file": "docs/tasks/start-sandbox.md",
+        "hash": "16146205996183485790"
+      },
+      {
+        "file": "docs/tasks/stop-sandbox.md",
+        "hash": "8800875464450243716"
+      },
+      {
+        "file": "docs/tasks/test.md",
+        "hash": "10307067450298576011"
+      },
+      {
+        "file": "docs/tasks/transfer.md",
+        "hash": "3089300758143081349"
+      },
+      {
+        "file": "docs/tasks/typecheck-all.md",
+        "hash": "2643602502936880794"
+      },
+      {
+        "file": "docs/tasks/typecheck.md",
+        "hash": "17004150901166025506"
+      },
+      {
+        "file": "docs/tasks/uninstall.md",
+        "hash": "15125800616503088589"
+      },
+      {
+        "file": "docs/terms/taquito.mdx",
+        "hash": "14583334621704289426"
+      },
+      {
+        "file": "docs/troubleshooting.mdx",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "docs/vs-code-extension/overview.mdx",
+        "hash": "745803836059074432"
+      },
+      {
+        "file": "docusaurus.config.js",
+        "hash": "16557929305366551299"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "13859177632528069222"
+      },
+      {
+        "file": "package.json",
+        "hash": "10491208045853176439"
+      },
+      {
+        "file": "redirects.txt",
+        "hash": "9027675101901753708"
+      },
+      {
+        "file": "robots.txt",
+        "hash": "17715716889398989167"
+      },
+      {
+        "file": "sidebars.js",
+        "hash": "9038978143278929297"
+      },
+      {
+        "file": "src/components/Features/Features.js",
+        "hash": "8527008544825808372"
+      },
+      {
+        "file": "src/components/Features/Features.module.css",
+        "hash": "4818172437292460554"
+      },
+      {
+        "file": "src/components/FooterForm/FooterForm.js",
+        "hash": "15759068679497927308"
+      },
+      {
+        "file": "src/components/FooterForm/FooterForm.module.css",
+        "hash": "11932369953796558404"
+      },
+      {
+        "file": "src/components/FooterTop/FooterTop.js",
+        "hash": "12257612945711641662"
+      },
+      {
+        "file": "src/components/FooterTop/FooterTop.module.css",
+        "hash": "8250382453082646208"
+      },
+      {
+        "file": "src/components/Helpers/NodeRequirement.js",
+        "hash": "12419125469875369188"
+      },
+      {
+        "file": "src/components/Helpers/TaqVersion.js",
+        "hash": "1931424506530037902"
+      },
+      {
+        "file": "src/components/Hero/Hero.js",
+        "hash": "15170083861338004262"
+      },
+      {
+        "file": "src/components/Hero/Hero.module.css",
+        "hash": "10148548517443646652"
+      },
+      {
+        "file": "src/components/LogoGrid/LogoGrid.js",
+        "hash": "13029086423299733844"
+      },
+      {
+        "file": "src/components/LogoGrid/LogoGrid.module.css",
+        "hash": "877217719120532101"
+      },
+      {
+        "file": "src/components/WhyTaqueria/WhyTaqueria.js",
+        "hash": "8623893128139962966"
+      },
+      {
+        "file": "src/components/WhyTaqueria/WhyTaqueria.module.css",
+        "hash": "17864137656751416341"
+      },
+      {
+        "file": "src/css/admonitions.scss",
+        "hash": "12796447046319613916"
+      },
+      {
+        "file": "src/css/codeBlock.scss",
+        "hash": "7108498191056002540"
+      },
+      {
+        "file": "src/css/custom.css",
+        "hash": "17740035186581774770"
+      },
+      {
+        "file": "src/css/tables.scss",
+        "hash": "11772364991598078399"
+      },
+      {
+        "file": "src/css/tabs.scss",
+        "hash": "14976093531468284946"
+      },
+      {
+        "file": "src/pages/index.js",
+        "hash": "1553867236927675394"
+      },
+      {
+        "file": "src/pages/index.module.css",
+        "hash": "14307884044012584000"
+      },
+      {
+        "file": "src/pages/markdown-page.md",
+        "hash": "2637912770613796076"
+      },
+      {
+        "file": "src/theme/Footer/index.js",
+        "hash": "3535752263331463752"
+      },
+      {
+        "file": "src/theme/Footer/styles.module.css",
+        "hash": "14945467363114795587"
+      },
+      {
+        "file": "static/.nojekyll",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "static/gif/mp4gifcode.mp4",
+        "hash": "12204752354629879048"
+      },
+      {
+        "file": "static/gif/taq_compile.mp4",
+        "hash": "6583096286034797139"
+      },
+      {
+        "file": "static/gif/taq_hero.mp4",
+        "hash": "1688318970268488923"
+      },
+      {
+        "file": "static/gif/taq_init.mp4",
+        "hash": "14834047396328430641"
+      },
+      {
+        "file": "static/gif/taq_originate.mp4",
+        "hash": "5443941447992536469"
+      },
+      {
+        "file": "static/gif/taq_plugins.mp4",
+        "hash": "26616819254726957"
+      },
+      {
+        "file": "static/img/CautionIcon.png",
+        "hash": "15064049215782241115"
+      },
+      {
+        "file": "static/img/ECAD_logo.svg",
+        "hash": "17549760551580169600"
+      },
+      {
+        "file": "static/img/InfoIcon.png",
+        "hash": "14503324444062549979"
+      },
+      {
+        "file": "static/img/Taqueria_magenta_beta.svg",
+        "hash": "4985158870104997910"
+      },
+      {
+        "file": "static/img/Taqueria_purple_beta.svg",
+        "hash": "7505382943339266502"
+      },
+      {
+        "file": "static/img/TipIcon.png",
+        "hash": "289860127365610323"
+      },
+      {
+        "file": "static/img/archetype.png",
+        "hash": "14477031461365509833"
+      },
+      {
+        "file": "static/img/box.svg",
+        "hash": "15007655190674308562"
+      },
+      {
+        "file": "static/img/briefcase.png",
+        "hash": "2915740532878102913"
+      },
+      {
+        "file": "static/img/briefcase.svg",
+        "hash": "8454411620832211376"
+      },
+      {
+        "file": "static/img/credit_card.svg",
+        "hash": "16095622528818612636"
+      },
+      {
+        "file": "static/img/discordSVG.svg",
+        "hash": "11499976150594907875"
+      },
+      {
+        "file": "static/img/docusaurus.png",
+        "hash": "11805897491343913808"
+      },
+      {
+        "file": "static/img/favicon.ico",
+        "hash": "18342594763893748365"
+      },
+      {
+        "file": "static/img/footerLogoSVG.svg",
+        "hash": "10643091382865971277"
+      },
+      {
+        "file": "static/img/form-48.png",
+        "hash": "6886751482677398346"
+      },
+      {
+        "file": "static/img/fund-using-faucet.png",
+        "hash": "4720220105489611916"
+      },
+      {
+        "file": "static/img/githubSVG.svg",
+        "hash": "129269105758149237"
+      },
+      {
+        "file": "static/img/hello-tacos-screenshot.png",
+        "hash": "1789919477403292623"
+      },
+      {
+        "file": "static/img/heroSVG.svg",
+        "hash": "16194267555814540958"
+      },
+      {
+        "file": "static/img/image.png",
+        "hash": "13081977128233810756"
+      },
+      {
+        "file": "static/img/key.svg",
+        "hash": "11520861800932295487"
+      },
+      {
+        "file": "static/img/ligolang.png",
+        "hash": "14949592675348066102"
+      },
+      {
+        "file": "static/img/loading-circle.gif",
+        "hash": "18331694859654596146"
+      },
+      {
+        "file": "static/img/logo.png",
+        "hash": "9397672050461402249"
+      },
+      {
+        "file": "static/img/logo.svg",
+        "hash": "15756779054106865036"
+      },
+      {
+        "file": "static/img/logoRedSVG.svg",
+        "hash": "328574374661165959"
+      },
+      {
+        "file": "static/img/logoSVG.svg",
+        "hash": "5255161479416765604"
+      },
+      {
+        "file": "static/img/picture-48.png",
+        "hash": "8790052474888056933"
+      },
+      {
+        "file": "static/img/pinata.png",
+        "hash": "13247963352347282080"
+      },
+      {
+        "file": "static/img/purpleBG.png",
+        "hash": "450683554061635547"
+      },
+      {
+        "file": "static/img/smartpy.png",
+        "hash": "13206758456817598554"
+      },
+      {
+        "file": "static/img/taq-help-cli.png",
+        "hash": "3841945369523984652"
+      },
+      {
+        "file": "static/img/taq_orange.png",
+        "hash": "15207740613123108360"
+      },
+      {
+        "file": "static/img/taq_orange.svg",
+        "hash": "7274826241757250159"
+      },
+      {
+        "file": "static/img/taq_pink.png",
+        "hash": "1833273844453547525"
+      },
+      {
+        "file": "static/img/taq_pink.svg",
+        "hash": "2370892793326987799"
+      },
+      {
+        "file": "static/img/taq_purple.png",
+        "hash": "7151590367720821299"
+      },
+      {
+        "file": "static/img/taq_purple.svg",
+        "hash": "10413438585799021034"
+      },
+      {
+        "file": "static/img/taqueria-plugin-vscode-install.png",
+        "hash": "4164955055361169449"
+      },
+      {
+        "file": "static/img/taqueria_diagram.png",
+        "hash": "6211370237759923428"
+      },
+      {
+        "file": "static/img/taquito.png",
+        "hash": "7198487805844151102"
+      },
+      {
+        "file": "static/img/tezTalksBanner.png",
+        "hash": "11298755560560623886"
+      },
+      {
+        "file": "static/img/triangle1.svg",
+        "hash": "14225196828868952228"
+      },
+      {
+        "file": "static/img/triangle2.svg",
+        "hash": "5824174887787923887"
+      },
+      {
+        "file": "static/img/triangle3.svg",
+        "hash": "10068150045890663822"
+      },
+      {
+        "file": "static/img/triangle4.svg",
+        "hash": "10433707455097824139"
+      },
+      {
+        "file": "static/img/triangle5.svg",
+        "hash": "17553578587557524900"
+      },
+      {
+        "file": "static/img/tutorial/docsVersionDropdown.png",
+        "hash": "6885437977057327417"
+      },
+      {
+        "file": "static/img/tutorial/localeDropdown.png",
+        "hash": "253269832391595414"
+      },
+      {
+        "file": "static/img/twitterSVG.svg",
+        "hash": "216282360784124968"
+      },
+      {
+        "file": "static/img/undraw_docusaurus_mountain.svg",
+        "hash": "12580885955753741779"
+      },
+      {
+        "file": "static/img/undraw_docusaurus_react.svg",
+        "hash": "15724667530732833819"
+      },
+      {
+        "file": "static/img/undraw_docusaurus_tree.svg",
+        "hash": "9216166069443140769"
+      },
+      {
+        "file": "static/img/vs-code/taqueria-vs-code-artifacts-section.png",
+        "hash": "12724336961565038762"
+      },
+      {
+        "file": "static/img/vs-code/taqueria-vs-code-contracts-section.png",
+        "hash": "4898223905521527904"
+      },
+      {
+        "file": "static/img/vs-code/taqueria-vs-code-environments-section.png",
+        "hash": "15736320616236951758"
+      },
+      {
+        "file": "static/img/vs-code/taqueria-vs-code-hide-unhide-sections.png",
+        "hash": "14889126994742861728"
+      },
+      {
+        "file": "static/img/vs-code/taqueria-vs-code-intro.png",
+        "hash": "9068826063006461429"
+      },
+      {
+        "file": "static/img/vs-code/taqueria-vs-code-plugins-section.png",
+        "hash": "2613179273334831296"
+      },
+      {
+        "file": "static/img/vs-code/taqueria-vs-code-project-sections.png",
+        "hash": "7134782977463066554"
+      },
+      {
+        "file": "static/img/vs-code/taqueria-vs-code-sandboxes-section.png",
+        "hash": "8464280227054877083"
+      },
+      {
+        "file": "static/img/vs-code/taqueria-vs-code-select-environment-option.png",
+        "hash": "2606045518021352164"
+      },
+      {
+        "file": "static/img/vs-code/taqueria-vs-code-tests-section.png",
+        "hash": "7247178367615827371"
+      },
+      {
+        "file": "static/install-taq.sh",
+        "hash": "11146832478651239103"
+      },
+      {
+        "file": "static/robots.txt",
+        "hash": "3603880973768099988"
+      },
+      {
+        "file": "webpack-plugin.js",
+        "hash": "4420802605685397431"
+      }
+    ]
+  },
+  "externalNodesHash": "396243534504877768"
+}
