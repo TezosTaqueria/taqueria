@@ -6,7 +6,7 @@ export async function getFileIPFSHash(filePath: string): Promise<string> {
 	const fileContent = await readFile(filePath);
 
 	// Create a SHA-256 hash of the file contents
-	const hash = createHash('sha256').update(fileContent).digest('hex');
+	const hash = createHash('sha256').update(new Uint8Array(fileContent)).digest('hex');
 
 	// Return the hash as a string
 	return hash;
