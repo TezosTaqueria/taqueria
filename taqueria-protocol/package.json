@@ -321,9 +321,9 @@
 	},
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.5.0",
-		"@taquito/signer": "23.1.0",
-		"@taquito/taquito": "23.1.0",
-		"@taquito/utils": "23.1.0",
+		"@taquito/signer": "24.0.0-RC.0",
+		"@taquito/taquito": "24.0.0-RC.0",
+		"@taquito/utils": "24.0.0-RC.0",
 		"batching-toposort": "^1.2.0",
 		"esbuild": "^0.27.2",
 		"fluture": "^14.0.0",

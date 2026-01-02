@@ -39,9 +39,9 @@
 	"dependencies": {
 		"@babel/runtime": "^7.28.4",
 		"@taqueria/protocol": "workspace:*",
-		"@taquito/signer": "23.1.0",
-		"@taquito/taquito": "23.1.0",
-		"@taquito/utils": "23.1.0",
+		"@taquito/signer": "24.0.0-RC.0",
+		"@taquito/taquito": "24.0.0-RC.0",
+		"@taquito/utils": "24.0.0-RC.0",
 		"bip39": "^3.1.0",
 		"fluture": "^14.0.0",
 		"i18next": "^25.7.3",

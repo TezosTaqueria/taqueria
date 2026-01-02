@@ -45,8 +45,8 @@
 		"@taqueria/node-sdk": "workspace:*",
 		"@taquito/michel-codec": "23.1.0",
 		"@taquito/rpc": "23.1.0",
-		"@taquito/signer": "23.1.0",
-		"@taquito/taquito": "23.1.0",
+		"@taquito/signer": "24.0.0-RC.0",
+		"@taquito/taquito": "24.0.0-RC.0",
 		"fast-glob": "^3.3.3",
 		"wtfnode": "^0.10.1"
 	},

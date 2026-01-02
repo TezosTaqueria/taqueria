@@ -36,8 +36,8 @@
 	"dependencies": {
 		"@taqueria/node-sdk": "workspace:*",
 		"@taquito/michel-codec": "23.1.0",
-		"@taquito/signer": "23.1.0",
-		"@taquito/taquito": "23.1.0",
+		"@taquito/signer": "24.0.0-RC.0",
+		"@taquito/taquito": "24.0.0-RC.0",
 		"bignumber.js": "^9.3.1",
 		"fast-glob": "^3.3.3"
 	},

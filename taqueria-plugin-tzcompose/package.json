@@ -23,7 +23,7 @@
 	},
 	"dependencies": {
 		"@taqueria/node-sdk": "workspace:*",
-		"@taquito/signer": "23.1.0"
+		"@taquito/signer": "24.0.0-RC.0"
 	},
 	"tsup": {
 		"entry": [
