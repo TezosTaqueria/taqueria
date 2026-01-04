@@ -380,7 +380,7 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 					// use same name as enviroment by default
 					x.value.networkName ?? `${x.key}`,
 				],
-				sandboxes: x.value.type !== `flextesa` ? [] : [
+				sandboxes: (x.value.type !== `flextesa` && x.value.type !== `tezbox`) ? [] : [
 					// use same name as enviroment by default
 					x.value.sandboxName ?? `${x.key}`,
 				],
