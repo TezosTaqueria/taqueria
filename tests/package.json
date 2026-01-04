@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/tests",
-	"version": "0.78.13",
+	"version": "0.78.14",
 	"type": "module",
 	"private": true,
 	"description": "This is Taqueria testing project includes unit, integration and e2e tests",
@@ -45,6 +45,7 @@
 		"@taquito/taquito": "24.0.0-RC.0",
 		"@types/jest": "^30.0.0",
 		"@types/node": "^25.0.3",
+		"bn.js": "^5.2.1",
 		"chokidar": "^3.5.3",
 		"eta": "^3.1.1",
 		"execa": "^9.6.1",

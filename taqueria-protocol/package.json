@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.78.13",
+	"version": "0.78.14",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -325,6 +325,7 @@
 		"@taquito/taquito": "24.0.0-RC.0",
 		"@taquito/utils": "24.0.0-RC.0",
 		"batching-toposort": "^1.2.0",
+		"bn.js": "^5.2.1",
 		"esbuild": "^0.27.2",
 		"fluture": "^14.0.0",
 		"i18next": "^25.7.3",

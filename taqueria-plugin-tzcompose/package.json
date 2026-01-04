@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-tzcompose",
-	"version": "0.78.13",
+	"version": "0.78.14",
 	"description": "A TzCompose plugin for Taqueria using the GoTz SDK",
 	"main": "index.js",
 	"scripts": {
@@ -23,7 +23,8 @@
 	},
 	"dependencies": {
 		"@taqueria/node-sdk": "workspace:*",
-		"@taquito/signer": "24.0.0-RC.0"
+		"@taquito/signer": "24.0.0-RC.0",
+		"bn.js": "^5.2.1"
 	},
 	"tsup": {
 		"entry": [

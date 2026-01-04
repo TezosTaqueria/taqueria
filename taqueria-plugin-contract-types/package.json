@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-contract-types",
-	"version": "0.78.13",
+	"version": "0.78.14",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",
@@ -35,10 +35,11 @@
 	},
 	"dependencies": {
 		"@taqueria/node-sdk": "workspace:*",
-		"@taquito/michel-codec": "23.1.0",
+		"@taquito/michel-codec": "24.0.0-RC.0",
 		"@taquito/signer": "24.0.0-RC.0",
 		"@taquito/taquito": "24.0.0-RC.0",
 		"bignumber.js": "^9.3.1",
+		"bn.js": "^5.2.1",
 		"fast-glob": "^3.3.3"
 	},
 	"types": "index.esm.d.ts",
