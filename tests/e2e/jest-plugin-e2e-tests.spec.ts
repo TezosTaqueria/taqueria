@@ -106,6 +106,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 			await waitForText("Project taq'ified!");
 			const { stdout } = await execute('taq', 'install ../taqueria-plugin-jest', './test-project');
 			expect(stdout).toContain('Plugin installed successfully');
+			await new Promise(r => setTimeout(r, 2750));
 			const { stdout: stdout1 } = await execute('npm', 'install --save-dev ts-jest', './test-project');
 			expect(stdout1).toEqual(expect.arrayContaining([expect.stringContaining('packages')]));
 			const { stdout: stdout2 } = await execute('npm', 'i --save-dev @types/jest', './test-project');
@@ -128,6 +129,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 			await waitForText("Project taq'ified!");
 			const { stdout } = await execute('taq', 'install ../taqueria-plugin-jest', './test-project');
 			expect(stdout).toContain('Plugin installed successfully');
+			await new Promise(r => setTimeout(r, 2750));
 			const { stdout: stdout1 } = await execute('npm', 'install --save-dev ts-jest', './test-project');
 			expect(stdout1).toEqual(expect.arrayContaining([expect.stringContaining('packages')]));
 			const { stdout: stdout2 } = await execute('npm', 'i --save-dev @types/jest', './test-project');
