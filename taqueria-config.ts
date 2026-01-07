@@ -36,7 +36,7 @@ export const defaultConfig: Config.t = Config.create({
 			sandboxes: ['local'],
 		},
 		testing: {
-			networks: ['ghostnet'],
+			networks: ['shadownet'],
 			sandboxes: [],
 		},
 		production: {
@@ -58,6 +58,10 @@ export const defaultConfig: Config.t = Config.create({
 		joe: '30_000_000',
 	},
 	network: {
+		shadownet: {
+			label: 'shadownet',
+			rpcUrl: 'https://rpc.shadownet.teztnets.com',
+		},
 		ghostnet: {
 			label: 'ghostnet',
 			rpcUrl: 'https://ghostnet.ecadinfra.com',
