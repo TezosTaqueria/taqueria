@@ -565,8 +565,16 @@ export const getCurrentEnvironment = (parsedArgs: Protocol.RequestArgs.t): strin
 };
 
 /**
- * Gets the name of the current environment
+ * Gets the faucet URL for a given network name
+ * Maps known testnets to their specific faucet URLs
  */
+export const getFaucetUrl = (networkName: string): string => {
+	const knownTestnets = ['shadownet', 'ghostnet', 'weeklynet', 'dailynet'];
+	const lowerName = networkName.toLowerCase();
+	const match = knownTestnets.find(net => lowerName.includes(net));
+	return match ? `https://faucet.${match}.teztnets.com` : 'https://teztnets.com';
+};
+
 /**
  * Gets the configuration for the current environment, if one is configured
  */
@@ -736,10 +744,11 @@ export const getAccountPrivateKey = async (
 		}
 
 		if (account === TAQ_OPERATOR_ACCOUNT) {
+			const faucetUrl = getFaucetUrl(network.label as string);
 			return sendAsyncErr(
 				`A keypair with public key hash ${
 					network.accounts[account].publicKeyHash
-				} was generated for you.\nTo fund this account:\n1. Go to https://teztnets.com and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+				} was generated for you.\nTo fund this account:\n1. Go to ${faucetUrl}\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)\n\nAlternatively, use --sender <accountAlias> if you have an already-funded account.`,
 			);
 		}
 	}

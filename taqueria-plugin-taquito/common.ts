@@ -1,6 +1,7 @@
 import {
 	getAccountPrivateKey,
 	getDefaultSandboxAccount,
+	getFaucetUrl,
 	getNetworkConfig,
 	getSandboxConfig,
 	RequestArgs,
@@ -201,8 +202,9 @@ export const handleOpsError = (err: unknown, env: string): Promise<never> => {
 			const result = msg.match(/(?<="implicit":")tz[^"]+(?=")/);
 			const publicKeyHash = result ? result[0] : undefined;
 			if (publicKeyHash) {
+				const faucetUrl = getFaucetUrl(env);
 				return sendAsyncErr(
-					`The account ${publicKeyHash} for the target environment, "${env}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.com and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+					`The account ${publicKeyHash} for the target environment, "${env}", may not be funded\nTo fund this account:\n1. Go to ${faucetUrl}\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)\n\nAlternatively, use --sender <accountAlias> if you have an already-funded account.`,
 				);
 			}
 		}
