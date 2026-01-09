@@ -123,7 +123,7 @@ export const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV
 				.map(([k, v]) => [k, v] as [string, Environment])
 				.map(([k, v]) => [k, {
 					// Known fields
-					type: v.sandboxes.length ? `flextesa` : `simple`,
+					type: v.sandboxes.length ? `tezbox` : `simple`,
 					// Unknown fields
 					...((() => {
 						const vClone = { ...v } as Partial<typeof v> & ConfigEnvironmentFileV2;
@@ -178,7 +178,7 @@ export const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 =
 			.map(([k, v]) => [k, v] as [string, Environment])
 			.map(([k, v]) => [k, {
 				// Known fields
-				type: v.sandboxes.length ? `flextesa` : `simple`,
+				type: v.sandboxes.length ? `tezbox` : `simple`,
 				// Unknown fields
 				...((() => {
 					const vClone = { ...v } as Partial<typeof v> & ConfigEnvironmentFileV2;
