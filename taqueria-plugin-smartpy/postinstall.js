@@ -131,7 +131,7 @@ const main = async () => {
   console.log(`[${dockerCheck}] docker`);
   console.log(`[${pythonCheck}] python 3.10 or greater`);
   console.log(`[${pipCheck}] pip`);
-  console.log(`[${smartPyCheck}] smartpy v0.22.0 or greater`);
+  console.log(`[${smartPyCheck}] smartpy v0.24.0 or greater`);
   console.log('')
 };
 

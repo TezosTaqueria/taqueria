@@ -43,10 +43,10 @@
 	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
 	"dependencies": {
 		"@taqueria/node-sdk": "workspace:*",
-		"@taquito/michel-codec": "24.0.0-RC.0",
-		"@taquito/rpc": "24.0.0-RC.0",
-		"@taquito/signer": "24.0.0-RC.0",
-		"@taquito/taquito": "24.0.0-RC.0",
+		"@taquito/michel-codec": "^24.3.0",
+		"@taquito/rpc": "^24.3.0",
+		"@taquito/signer": "^24.3.0",
+		"@taquito/taquito": "^24.3.0",
 		"bn.js": "^5.2.1",
 		"fast-glob": "^3.3.3",
 		"wtfnode": "^0.10.1"
