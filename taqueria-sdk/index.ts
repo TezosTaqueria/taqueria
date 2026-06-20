@@ -569,7 +569,7 @@ export const getCurrentEnvironment = (parsedArgs: Protocol.RequestArgs.t): strin
  * Maps known testnets to their specific faucet URLs
  */
 export const getFaucetUrl = (networkName: string): string => {
-	const knownTestnets = ['shadownet', 'ghostnet', 'weeklynet', 'dailynet'];
+	const knownTestnets = ['shadownet', 'weeklynet', 'dailynet'];
 	const lowerName = networkName.toLowerCase();
 	const match = knownTestnets.find(net => lowerName.includes(net));
 	return match ? `https://faucet.${match}.teztnets.com` : 'https://teztnets.com';

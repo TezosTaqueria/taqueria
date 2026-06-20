@@ -39,7 +39,7 @@ The `compile` task is implemented by more than one compiler plugin (SmartPy, Arc
 The SmartPy plugin exposes a `compile` task in Taqueria which can target one SmartPy contract in the `contracts` folder and compile it to a Michelson `.tz` file output to the `artifacts` folder
 
 ### A frictionless smart contract development workflow
-We provide a smooth SmartPy workflow for our SmartPy plugin by making it easier to get started and maintain the contracts. You can get started by simply performing `taq compile my_contract.py` then `taq deploy my_contract.tz` (or `taq deploy my_contract.tz --env testing` to deploy to ghostnet) and now you've deployed a contract originally written in SmartPy
+We provide a smooth SmartPy workflow for our SmartPy plugin by making it easier to get started and maintain the contracts. You can get started by simply performing `taq compile my_contract.py` then `taq deploy my_contract.tz` (or `taq deploy my_contract.tz --env testing` to deploy to shadownet) and now you've deployed a contract originally written in SmartPy
 
 To benefit from this workflow, users will have to define all compilation and expression compilation targets in their main SmartPy contract file and the `compile` task will compile them all and copy the relevant artifacts (contract, storage, and expression files) to the `artifacts` folder. All other artifacts will be stored under `artifacts/.smartpy`
 

@@ -46,7 +46,7 @@
 		},
 		"testing": {
 			"networks": [
-				"ghostnet"
+				"shadownet"
 			],
 			"sandboxes": [],
 			"aliases": {
@@ -57,9 +57,9 @@
 		}
 	},
 	"network": {
-		"ghostnet": {
-			"label": "ghostnet",
-			"rpcUrl": "https://ghostnet.ecadinfra.com",
+		"shadownet": {
+			"label": "shadownet",
+			"rpcUrl": "https://tezos-shadownet.octez.io",
 			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"
 		}
 	},
