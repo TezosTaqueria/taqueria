@@ -945,7 +945,7 @@ def main():
             A draw offering is denied by calling the `deny_draw` entrypoint  or by playing a move.
             """
             assert not self.data.status.is_variant.finished(), "Game finished"
-            assert self.data.players.contains(sp.sender), "Wrong player"
+            assert sp.sender in self.data.players, "Wrong player"
             self.data.draw_offer.add(sp.sender)
             if sp.len(self.data.draw_offer) == 2:
                 self.data.status = sp.variant.finished("draw")
@@ -966,10 +966,10 @@ def main():
                 sp.sender == self.data.players_map[self.data.board_state.nextPlayer]
             ), "Wrong player"
             assert self.data.status.is_variant.claim_stalemate()
-            with sp.match(answer):
-                with sp.case.accept:
+            match answer:
+                case accept(_):
                     self.data.status = sp.variant.finished("draw")
-                with sp.case.refuse as refuse_move:
+                case refuse(refuse_move):
                     # TODO: check if we need to update board_state with return value.
                     _ = self.move_piece(
                         sp.record(

@@ -15,10 +15,16 @@ let useVenv: boolean | null = null;
  */
 const ensureVenvExists = async (): Promise<void> => {
 	if (useVenv === null) {
-		// First time - check if global pip exists
+		// First time - check if a global pip exists AND is usable for installs.
 		try {
 			await exec('pip --version');
-			useVenv = false;
+			// PEP 668: a global pip may refuse to install into an externally-managed
+			// environment (the default on recent Debian/Ubuntu). Fall back to a venv,
+			// mirroring the SmartPy plugin's postinstall behavior.
+			const { stdout } = await exec(
+				`python3 -c "import os, sysconfig; print(os.path.join(sysconfig.get_path('stdlib'), 'EXTERNALLY-MANAGED'))"`,
+			);
+			useVenv = require('fs').existsSync(stdout.trim());
 		} catch {
 			// Global pip not found - we'll need a venv
 			useVenv = true;
@@ -147,7 +153,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			const pipCmd = await getPipInstallCommand();
 			const pythonCmd = await getPythonCommand();
 			const pipResult = await exec(
-				`${pipCmd} smartpy-tezos`,
+				`${pipCmd} smartpy-tezos==0.25.0a7`,
 			);
 			expect(pipResult.stderr.trim().split('\n').filter(l => !l.includes('pip') && l.length > 0)).toEqual([]);
 
@@ -195,7 +201,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				const pipCmd = await getPipInstallCommand();
 				const pythonCmd = await getPythonCommand();
 				const pipResult = await exec(
-					`${pipCmd} smartpy-tezos`,
+					`${pipCmd} smartpy-tezos==0.25.0a7`,
 					{ cwd: testProjectDir },
 				);
 				expect(pipResult.stderr.trim().split('\n').filter(l => !l.includes('pip') && l.length > 0)).toEqual([]);
@@ -344,9 +350,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 			// Compile all contracts
 			const { stdout, stderr } = await execute('taq', 'compile-all', './test-project');
-			expect(stderr).toEqual([
-				'contracts/chess.py:969: warning: sp.match is deprecated. Please use the new pattern matching syntax.',
-			]);
+			expect(stderr).toEqual([]);
 			expect(stdout).toEqual([
 				'┌───────────────────────┬──────────────────────────┐',
 				'│ Source                │ Artifact                 │',
