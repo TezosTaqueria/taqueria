@@ -4,6 +4,12 @@ const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
+	// Pre-pull the octez image (keep the tag in sync with taqueria-plugin-octez-client/common.ts)
+	// so the first test doesn't spend its entire timeout on a multi-GB cold docker pull.
+	beforeAll(async () => {
+		await exec('docker pull tezos/tezos-bare:octez-v25.0');
+	}, 300000);
+
 	test('typecheck will check a contract in the artifacts folder', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');

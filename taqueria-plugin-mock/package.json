@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-mock",
-	"version": "0.81.6",
+	"version": "0.81.7",
 	"description": "A plugin used to test Taqueria",
 	"private": true,
 	"scripts": {
