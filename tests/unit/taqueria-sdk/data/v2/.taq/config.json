@@ -44,7 +44,7 @@
 	"environmentDefault": "testing",
 	"environments": {
 		"development": {
-			"type": "flextesa",
+			"type": "tezbox",
 			"label": "Local Tezos Sandbox",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
 			"rpcUrl": "http://localhost:21000"
