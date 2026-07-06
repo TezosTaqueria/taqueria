@@ -143,9 +143,11 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 			const test_file_two = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-2.ts`)).stdout;
 			await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-2.spec.ts', test_file_two);
 
+			// jest 30's default reporter no longer prints PASS lines for passing suites in
+			// non-interactive runs, so assert on the summary instead
 			const { stderr } = await execute('taq', 'test multi-file-single-test', './test-project');
-			expect(stderr).toEqual(expect.arrayContaining(['PASS  multi-file-single-test/empty-jest-test-file-1.spec.ts']));
-			expect(stderr).toEqual(expect.arrayContaining(['PASS  multi-file-single-test/empty-jest-test-file-2.spec.ts']));
+			expect(stderr).toEqual(expect.arrayContaining(['Test Suites: 2 passed, 2 total']));
+			expect(stderr).toEqual(expect.arrayContaining(['Tests:       2 passed, 2 total']));
 
 			await cleanup();
 		});
@@ -168,8 +170,11 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const test_file = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-1.ts`)).stdout;
 		await writeFile('./test-project/dummy-test/empty-jest-test-file-1.spec.ts', test_file);
 
+		// jest 30's default reporter no longer prints PASS lines for passing suites in
+		// non-interactive runs, so assert on the summary instead
 		const { stderr } = await execute('taq', 'test dummy-test', './test-project');
-		expect(stderr).toEqual(expect.arrayContaining(['PASS  dummy-test/empty-jest-test-file-1.spec.ts']));
+		expect(stderr).toEqual(expect.arrayContaining(['Test Suites: 1 passed, 1 total']));
+		expect(stderr).toEqual(expect.arrayContaining(['Tests:       1 passed, 1 total']));
 
 		await cleanup();
 	});
@@ -193,9 +198,11 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const test_file_two = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-2.ts`)).stdout;
 		await writeFile('./test-project/multi-file-test/empty-jest-test-file-2.spec.ts', test_file_two);
 
+		// jest 30's default reporter no longer prints PASS lines for passing suites in
+		// non-interactive runs, so assert on the summary instead
 		const { stderr } = await execute('taq', 'test multi-file-test', './test-project');
-		expect(stderr).toEqual(expect.arrayContaining(['PASS  multi-file-test/empty-jest-test-file-1.spec.ts']));
-		expect(stderr).toEqual(expect.arrayContaining(['PASS  multi-file-test/empty-jest-test-file-2.spec.ts']));
+		expect(stderr).toEqual(expect.arrayContaining(['Test Suites: 2 passed, 2 total']));
+		expect(stderr).toEqual(expect.arrayContaining(['Tests:       2 passed, 2 total']));
 
 		await cleanup();
 	});

@@ -2,7 +2,7 @@ import { execCmd, getArch, getArchSync, getDockerImage, ProxyTaskArgs, RequestAr
 import { join } from 'path';
 
 // Should point to the latest stable version, so it needs to be updated as part of our release process.
-const getFlextesaImage = (_arch: 'linux/arm64/v8' | 'linux/amd64'): string => 'tezos/tezos-bare:octez-v23.2';
+const getFlextesaImage = (_arch: 'linux/arm64/v8' | 'linux/amd64'): string => 'tezos/tezos-bare:octez-v25.0';
 
 const OCTEZ_CLIENT_IMAGE_ENV_VAR = 'TAQ_OCTEZ_CLIENT_IMAGE';
 
@@ -32,7 +32,8 @@ export type IntersectionOpts = ClientOpts & TypeCheckOpts & TypeCheckAllOpts & S
 type UnionOpts = ClientOpts | TypeCheckOpts | TypeCheckAllOpts | SimulateOpts;
 
 // Need to talk to ECAD Labs about how to suppress warnings
-const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://rpc.tzbeta.net';
+// Shadownet allows the typecheck_code/run_code helper RPCs that rpc.tzbeta.net blocks via ACL
+const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://tezos-shadownet.octez.io';
 export const GLOBAL_OPTIONS = `--endpoint ${ENDPOINT}`;
 
 export const trimTezosClientMenuIfPresent = (msg: string): string => {

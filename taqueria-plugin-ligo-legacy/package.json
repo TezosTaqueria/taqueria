@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-ligo-legacy",
-	"version": "0.81.3",
+	"version": "0.81.4",
 	"description": "A taqueria plugin for compiling LIGO smart contracts that target LIGO v0.73.0 and earlier.",
 	"targets": {
 		"default": {
@@ -46,6 +46,7 @@
 		"fast-glob": "^3.3.3"
 	},
 	"devDependencies": {
+		"@types/node": "^25.0.3",
 		"tsup": "^8.5.1",
 		"typescript": "^5.9.3"
 	},

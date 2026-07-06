@@ -186,9 +186,9 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 		if (e instanceof Error && e.message.includes('503')) {
 			try {
 				const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(protocolArgs, env);
-				if (envType === 'Network' && nodeConfig.rpcUrl.includes('ghostnet')) {
+				if (envType === 'Network' && nodeConfig.rpcUrl.includes('shadownet')) {
 					return sendAsyncErr(
-						`❌ Ghostnet is returning 503 errors, indicating that the server is under heavy load.\nPlease try again later.`,
+						`❌ Shadownet is returning 503 errors, indicating that the server is under heavy load.\nPlease try again later.`,
 					);
 				}
 				return sendAsyncErr(

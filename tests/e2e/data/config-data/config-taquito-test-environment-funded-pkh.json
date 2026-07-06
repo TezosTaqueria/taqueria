@@ -12,7 +12,7 @@
 			]
 		},
 		"testing": {
-			"networks": ["ghostnet"],
+			"networks": ["shadownet"],
 			"sandboxes": []
 		},
 		"funds": {
@@ -28,9 +28,9 @@
 		}
 	},
 	"network": {
-		"ghostnet": {
-			"label": "ghostnet",
-			"rpcUrl": "https://ghostnet.ecadinfra.com",
+		"shadownet": {
+			"label": "shadownet",
+			"rpcUrl": "https://tezos-shadownet.octez.io",
 			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
 			"accounts": {
 				"taqOperatorAccount": {
@@ -42,7 +42,7 @@
 		},
 		"fundnet": {
 			"label": "fundnet",
-			"rpcUrl": "https://ghostnet.ecadinfra.com",
+			"rpcUrl": "https://tezos-shadownet.octez.io",
 			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
 			"accounts": {
 				"taqOperatorAccount": {

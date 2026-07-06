@@ -44,15 +44,15 @@
 	"environmentDefault": "testing",
 	"environments": {
 		"development": {
-			"type": "flextesa",
+			"type": "tezbox",
 			"label": "Local Tezos Sandbox",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
 			"rpcUrl": "http://localhost:21000"
 		},
 		"testing": {
 			"type": "simple",
-			"label": "ghostnet",
-			"rpcUrl": "https://ghostnet.ecadinfra.com",
+			"label": "shadownet",
+			"rpcUrl": "https://tezos-shadownet.octez.io",
 			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"
 		}
 	},

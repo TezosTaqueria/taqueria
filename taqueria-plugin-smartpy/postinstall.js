@@ -2,6 +2,9 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+// The version of SmartPy (PyPI package smartpy-tezos) that this plugin targets.
+const SMARTPY_VERSION = '0.24.1';
+
 const runCommand = (command) => {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
@@ -98,24 +101,46 @@ const checkPip = async (manager) => {
 
 const getPipCommand = () => useVenv ? `${getVenvPath()}/bin/pip` : 'pip';
 
+const installSmartPy = (pip) => runCommand(`${pip} install smartpy-tezos==${SMARTPY_VERSION}`);
+
 const checkSmartPy = async (pythonCheck, pipCheck) => {
   if (pythonCheck === '✖' || pipCheck === '✖') return '✖';
 
   const pip = getPipCommand();
 
   try {
-    // Check for smartpy-tezos (PyPI package name)
+    // Check that the targeted version of smartpy-tezos (PyPI package name) is installed
     const version = await runCommand(`${pip} show smartpy-tezos | grep Version`);
-    return '✔';
+    if (version.includes(SMARTPY_VERSION)) return '✔';
+    // A different version is installed - reinstall the targeted version
+    console.log(`Found ${version.trim()}, switching to smartpy-tezos==${SMARTPY_VERSION}...`);
   } catch {
-    try {
-      // Install from PyPI
-      await runCommand(`${pip} install smartpy-tezos`);
-      return '✔';
-    } catch {
-      console.log('Failed to install SmartPy.');
-      return '✖';
+    // Not installed yet
+  }
+
+  try {
+    // Install the targeted version from PyPI
+    await installSmartPy(pip);
+    return '✔';
+  } catch (err) {
+    // A global pip may refuse to install into an externally-managed environment
+    // (PEP 668, the default on recent Debian/Ubuntu). Fall back to an isolated venv.
+    if (!useVenv) {
+      try {
+        console.log(
+          'Global pip install failed (possibly an externally-managed environment); retrying in an isolated venv...',
+        );
+        useVenv = true;
+        await ensureVenvExists();
+        await installSmartPy(getPipCommand());
+        return '✔';
+      } catch (venvErr) {
+        console.log(`Failed to install SmartPy: ${venvErr}`);
+        return '✖';
+      }
     }
+    console.log(`Failed to install SmartPy: ${err}`);
+    return '✖';
   }
 };
 
@@ -131,7 +156,7 @@ const main = async () => {
   console.log(`[${dockerCheck}] docker`);
   console.log(`[${pythonCheck}] python 3.10 or greater`);
   console.log(`[${pipCheck}] pip`);
-  console.log(`[${smartPyCheck}] smartpy v0.22.0 or greater`);
+  console.log(`[${smartPyCheck}] smartpy v${SMARTPY_VERSION}`);
   console.log('')
 };
 

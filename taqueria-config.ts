@@ -60,11 +60,7 @@ export const defaultConfig: Config.t = Config.create({
 	network: {
 		shadownet: {
 			label: 'shadownet',
-			rpcUrl: 'https://rpc.shadownet.teztnets.com',
-		},
-		ghostnet: {
-			label: 'ghostnet',
-			rpcUrl: 'https://ghostnet.ecadinfra.com',
+			rpcUrl: 'https://tezos-shadownet.octez.io',
 		},
 		mainnet: {
 			label: 'mainnet',
