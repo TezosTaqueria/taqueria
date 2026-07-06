@@ -29,7 +29,18 @@ export const toRequestArgs = (args: RequestArgs.t): CustomRequestArgs => {
 };
 
 export const getDefaultConfig = (defaultConfig: DefaultConfig) => {
-	const settings = { ...defaults, preset: 'ts-jest', testEnvironment: 'node' };
+	const settings = {
+		...defaults,
+		preset: 'ts-jest',
+		testEnvironment: 'node',
+		// Pass ts-jest an explicit tsconfig: consumer projects have no tsconfig.json, and
+		// relying on TypeScript's automatic @types inclusion breaks when npm resolves
+		// ts-jest's open typescript peer range to a version the preset doesn't support
+		// (e.g. TypeScript 6), leaving 'describe'/'test' undefined (TS2593).
+		transform: {
+			'^.+\\.tsx?$': ['ts-jest', { tsconfig: { types: ['jest'], esModuleInterop: true } }],
+		},
+	};
 	return (
 		`
 module.exports = ${JSON.stringify(settings, null, 4)}

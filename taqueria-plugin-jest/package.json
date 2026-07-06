@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-jest",
-	"version": "0.81.7",
+	"version": "0.81.8",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",
@@ -38,13 +38,15 @@
 		"bignumber.js": "^9.3.1",
 		"bn.js": "^5.2.1",
 		"fast-glob": "^3.3.3",
-		"jest-config": "^30.4.2"
+		"jest": "^30.4.2",
+		"jest-config": "^30.4.2",
+		"ts-jest": "^29.4.6",
+		"typescript": "^5.9.3"
 	},
 	"devDependencies": {
 		"@types/async-retry": "^1.4.9",
 		"@types/node": "^25.0.3",
-		"tsup": "^8.5.1",
-		"typescript": "^5.9.3"
+		"tsup": "^8.5.1"
 	},
 	"tsup": {
 		"entry": [
