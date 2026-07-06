@@ -153,7 +153,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			const pipCmd = await getPipInstallCommand();
 			const pythonCmd = await getPythonCommand();
 			const pipResult = await exec(
-				`${pipCmd} smartpy-tezos==0.25.0a7`,
+				`${pipCmd} smartpy-tezos==0.24.1`,
 			);
 			expect(pipResult.stderr.trim().split('\n').filter(l => !l.includes('pip') && l.length > 0)).toEqual([]);
 
@@ -201,7 +201,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				const pipCmd = await getPipInstallCommand();
 				const pythonCmd = await getPythonCommand();
 				const pipResult = await exec(
-					`${pipCmd} smartpy-tezos==0.25.0a7`,
+					`${pipCmd} smartpy-tezos==0.24.1`,
 					{ cwd: testProjectDir },
 				);
 				expect(pipResult.stderr.trim().split('\n').filter(l => !l.includes('pip') && l.length > 0)).toEqual([]);

@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // The version of SmartPy (PyPI package smartpy-tezos) that this plugin targets.
-const SMARTPY_VERSION = '0.25.0a7';
+const SMARTPY_VERSION = '0.24.1';
 
 const runCommand = (command) => {
   return new Promise((resolve, reject) => {
@@ -119,7 +119,7 @@ const checkSmartPy = async (pythonCheck, pipCheck) => {
   }
 
   try {
-    // Install the targeted version from PyPI (== allows pre-releases such as 0.25.0a7)
+    // Install the targeted version from PyPI
     await installSmartPy(pip);
     return '✔';
   } catch (err) {
